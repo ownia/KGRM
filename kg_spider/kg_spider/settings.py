@@ -18,11 +18,17 @@ FEED_EXPORT_ENCODING = 'utf-8'
 RANDOM_UA_TYPE = 'random'
 DOWNLOAD_DELAY = 1.5
 
+ROBOTSTXT_OBEY = False
+
+DOWNLOADER_MIDDLEWARES = {
+    'kg_spider.middlewares.RandomUserAgentMiddleware': 100,
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+}
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'kg_spider (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32
@@ -58,11 +64,6 @@ ROBOTSTXT_OBEY = False
 # DOWNLOADER_MIDDLEWARES = {
 #    'kg_spider.middlewares.KgSpiderDownloaderMiddleware': 543,
 # }
-
-DOWNLOADER_MIDDLEWARES = {
-    'kg_spider.middlewares.RandomUserAgentMiddleware': 100,
-    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-}
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html

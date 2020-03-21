@@ -6,7 +6,7 @@ import sys
 class PconlineSpider(scrapy.Spider):
     name = 'pconline'
     # allowed_domains = ['pconline.com.cn']
-    start_urls = ['https://ks.pconline.com.cn/product.shtml?q=%BA%A3%B6%FB']
+    start_urls = ['https://ks.pconline.com.cn/product.shtml?q=tcl']
 
     def parse(self, response):
         # item = PcoItem()
@@ -19,6 +19,7 @@ class PconlineSpider(scrapy.Spider):
                 'context': each.xpath(
                     './/div[@class="item-title"]/span[@class="item-des"]/text()').extract()
             }
+
             next_page = response.xpath('//div[@class="page"]/a[@class="next"]/@href').get()
             if next_page is not None:
                 yield response.follow(next_page, self.parse)
