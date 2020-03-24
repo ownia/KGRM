@@ -1,7 +1,7 @@
 def addentity(inputfile):
     fp = open(inputfile, "r", encoding="utf-8")
     lines = fp.readlines()
-    str = "快递物流品牌,包括,"
+    str = "海尔(Haier),包括,"
     with open("output.txt", "a+", encoding="utf-8")as f:
         for line in lines:
             line_new = line.replace('（', '(').replace('）', ')')
@@ -15,7 +15,7 @@ def append(inputfile):
     with open("output.txt", "a+", encoding="utf-8")as f:
         for line_list in lines:
             line_new = line_list.replace('\n', '').replace('（', '(').replace('）', ')')
-            line_new = line_new + r',newNode' + '\n'
+            line_new = line_new + r',product' + '\n'
             f.write(line_new)
     fp.close()
 
@@ -30,5 +30,5 @@ def kdbind(inputfile):
 
 
 if __name__ == '__main__':
-    inputfile = "2.txt"
-    addentity(inputfile)
+    inputfile = "name.txt"
+    append(inputfile)

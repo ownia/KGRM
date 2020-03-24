@@ -16,7 +16,7 @@ class PconlineSpider(scrapy.Spider):
                 'name':
                     each.xpath(
                         './/div[@class="item-title"]/a[@class="item-name"]/@title').extract(),
-                'context': each.xpath(
+                'content': each.xpath(
                     './/div[@class="item-title"]/span[@class="item-des"]/text()').extract()
             }
 
