@@ -13,7 +13,7 @@ chrome_options.add_argument('--disable-gpu')
 chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
 # chrome_options.add_experimental_option('excludeSwitches', ['enable-automation'])
 driver = webdriver.Chrome(executable_path=chrome_driver, options=chrome_options)
-
+# ua=UserAgent()
 reader = csv.reader(open('kd.csv', encoding='utf-8'))
 f = open(r"industry.csv", 'w', encoding='utf-8', newline="")
 csv_writer = csv.writer(f)
