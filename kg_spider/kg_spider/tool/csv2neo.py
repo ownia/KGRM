@@ -4,6 +4,24 @@ import pandas as pd
 import csv
 
 
+# 筛选公司和注册资本
+def csv_clean(csvfile):
+    csv_data = csv.reader(open(csvfile, 'r', encoding='utf-8'))
+    with open("clean.txt", "w", encoding="utf-8")as f:
+        for line in csv_data:
+            f.writelines(line[0] + "," + line[2] + "\n")
+
+
+def delete(file):
+    fp = open(file, 'r+', encoding='utf-8')
+    data = fp.readlines()
+    with open('fo.txt', 'w', encoding='utf-8')as f:
+        for line in data:
+            line_new = line.replace(',0,,', '')
+            f.writelines(line_new)
+    fp.close()
+
+
 def c2n(entityfile):
     # 读取三元组文件
     h_r_t_name = [":START_ID", "role", ":END_ID"]
@@ -42,4 +60,6 @@ if __name__ == '__main__':
     node = "node.csv"
     rel = "rel.csv"
     entity = "output.txt"
-    c2n(entity)
+    # c2n(entity)
+    # csv_clean("info.csv")
+    delete("clean.txt")

@@ -4,6 +4,7 @@ import codecs
 import sys
 
 
+# 删除冗余数据
 def delete_whitespace(jsonName, txtName):
     fp = open(jsonName, encoding='utf-8')
     wf = open(txtName, 'w', encoding='utf-8')

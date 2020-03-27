@@ -3,6 +3,7 @@ import csv
 import codecs
 
 
+# json文件转换为csv文件
 def json2csv(jsonName, csvName):
     jsonData = codecs.open(jsonName, 'r', 'utf-8')
     csvfile = open(csvName, 'w', newline='')
@@ -21,6 +22,7 @@ def json2csv(jsonName, csvName):
     csvfile.close()
 
 
+# 剥离出name,content,entirety
 def cut_data(jsonName):
     with open(jsonName, 'r', encoding='utf-8') as f:
         temp = json.load(f)

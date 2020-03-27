@@ -1,3 +1,4 @@
+# 添加前置实体和关系
 def addentity(inputfile):
     fp = open(inputfile, "r", encoding="utf-8")
     lines = fp.readlines()
@@ -9,6 +10,7 @@ def addentity(inputfile):
     fp.close()
 
 
+# 添加后置实体
 def append(inputfile):
     fp = open(inputfile, encoding="utf-8")
     lines = fp.readlines()
@@ -20,6 +22,7 @@ def append(inputfile):
     fp.close()
 
 
+# 快递物流绑定函数
 def kdbind(inputfile):
     fp = open(inputfile, encoding="utf-8")
     lines = fp.readlines()
