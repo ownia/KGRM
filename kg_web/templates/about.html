@@ -1,0 +1,22 @@
+{% extends "common/base.html" %}<!--继承基础模板-->
+{% block content %}<!--自定义模板区域-->
+<style type="text/css">
+    body {
+        margin-top: 60px;
+    }
+</style>
+<div class="col-xs-12 col-sm-9">
+    <p class="pull-right visible-xs">
+        <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
+    </p>
+    <div class="jumbotron">
+        <h1>KGRM</h1>
+        <p>基于知识图谱的家电制造服务资源管理系统</p>
+    </div>
+    <div>
+        <h3>技术栈</h3>
+        <li>neo4j图数据库</li>
+    </div><!--/.col-xs-6.col-lg-4-->
+</div><!--/.col-xs-12.col-sm-9-->
+
+{% endblock %}

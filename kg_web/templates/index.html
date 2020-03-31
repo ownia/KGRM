@@ -1,32 +1,63 @@
-{% extends "bootstrap/base.html" %}
+{% extends "common/base.html" %}<!--继承基础模板-->
+{% block content %}<!--自定义模板区域-->
+<style type="text/css">
+    body {
+        margin-top: 60px;
+    }
+</style>
+<div class="col-xs-12 col-sm-9">
+    <p class="pull-right visible-xs">
+        <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
+    </p>
+    <div id="main" style="width: 600px;height:400px;"></div>
 
-{% block title %}KGRM{% endblock %}
-
-{% block navbar %}
-<div class="navbar navbar-inverse" role="navigation">
     <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="/">Flask</a>
-        </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="/">Home</a></li>
-            </ul>
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 col-left">
+                <div class="css_height1" id="left1">
+                </div>
+                <div class="css_height" id="left2">
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 col-right">
+                <div class="right_title">
+                    <ul class="nav nav-pills">
+                        <li class="active">
+                              <a href="#right1" rel="external nofollow" data-toggle="pill">1</a>
+                        </li>
+                        <li>
+                              <a href="#right2" rel="external nofollow" data-toggle="pill">2</a>
+                        </li>
+                        <li>
+                              <a href="#" rel="external nofollow" rel="external nofollow" rel="external nofollow"
+                                 data-toggle="pill">3</a>
+                        </li>
+                        <li>
+                              <a href="#" rel="external nofollow" rel="external nofollow" rel="external nofollow"
+                                 data-toggle="pill">4</a>
+                        </li>
+                        <li>
+                              <a href="#" rel="external nofollow" rel="external nofollow" rel="external nofollow"
+                                 data-toggle="pill">5</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane fade in active" id="right1">
+                        <div class="css_height" id="right11">
+                        </div>
+                        <div class="css_height" id="right12">
+                        </div>
+                    </div>
+                    <div class="tab-pane fade in" id="right2">
+                        <div class="css_height" id="right21">
+                        </div>
+                        <div class="css_height" id="right22">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-{% endblock %}
-
-{% block content %}
-<div class="container">
-    <div class="page-header">
-        {% block page_content %}{% endblock %}
-    </div>
-</div>
+</div><!--/.col-xs-12.col-sm-9-->
 {% endblock %}
