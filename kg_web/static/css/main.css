@@ -19,3 +19,9 @@ html {
 .card-deck .card {
     min-width: 220px;
 }
+
+#cy {
+    height: 400px;
+    width: 500px;
+    background-color: #f9f9f9;
+}
