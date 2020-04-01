@@ -14,6 +14,7 @@
     <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/cytoscape.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <!-- Favicons -->
     <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <meta name="theme-color" content="#563d7c">
@@ -46,10 +47,12 @@
     <a class="btn btn-outline-primary" href="#">What's new?</a>
 </div>
 
+<!--
 <div>
     <h1>cytoscape</h1>
     <div id="cy"></div>
 </div>
+-->
 
 <div class="container">
     <div class="card-deck mb-3 text-center">
@@ -98,6 +101,13 @@
                 <button type="button" class="btn btn-lg btn-block btn-primary">Contact us</button>
             </div>
         </div>
+    </div>
+
+    <div style="height: 240px; overflow: auto ;pre-scrollable">
+        {% for table in tables %}
+        {{titles[loop.index]}}
+        {{ table|safe }}
+        {% endfor %}
     </div>
 
     <footer class="pt-4 my-md-5 pt-md-5 border-top">
