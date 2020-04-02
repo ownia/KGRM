@@ -26,7 +26,14 @@ def index():
     df = pd.DataFrame(graph.run(
         'MATCH (:class{title:"快递物流品牌"})-[r:RELATION {type :"包括"  }]->(n) RETURN n.title, n.registered ORDER BY '
         'n.registered').to_table())
-    df.drop(0, axis=0, inplace=True)
+    if request.method == "POST":
+        cypher = request.form['cypher']
+        print(cypher)
+        try:
+            df = pd.DataFrame(graph.run(cypher).to_table())
+            print(df)
+        except:
+            print('error')
     return render_template('index.html',
                            tables=[df.to_html(classes='table table-dark table-striped')],
                            titles=df.columns.values)
