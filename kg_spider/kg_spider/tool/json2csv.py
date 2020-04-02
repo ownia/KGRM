@@ -23,12 +23,12 @@ def json2csv(jsonName, csvName):
 
 
 # 剥离出name,content,entirety
-def cut_data(jsonName):
+def cut_data(jsonName, name):
     with open(jsonName, 'r', encoding='utf-8') as f:
         temp = json.load(f)
-        name_file = open('name.txt', mode='w', encoding='utf-8')
-        content_file = open('content.txt', mode='w', encoding='utf-8')
-        entirety_file = open('entirety_file.txt', mode='w', encoding='utf-8')
+        name_file = open(name + '_name.txt', mode='w', encoding='utf-8')
+        content_file = open(name + '_content.txt', mode='w', encoding='utf-8')
+        entirety_file = open(name + '_entirety_file.txt', mode='w', encoding='utf-8')
         for t in range(len(temp)):
             str1 = str(temp[t]['name']).replace("['", "").replace("']", "")
             str2 = str(temp[t]['content']).replace("['", "").replace("']", "")
@@ -42,9 +42,9 @@ def cut_data(jsonName):
 
 
 if __name__ == '__main__':
-    name = 'haier2'
+    name = 'littleswan'
     jsonName = name + '.json'
     csvName = name + '.csv'
     # json2csv(jsonName, csvName)
-    cut_data(jsonName)
+    cut_data(jsonName, name)
     print("transformed.")

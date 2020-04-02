@@ -16,7 +16,7 @@ def delete_whitespace(jsonName, txtName):
 
 
 if __name__ == '__main__':
-    name = 'tcl'
+    name = 'littleswan'
     jsonName = name + '.json'
     txtName = name + '.txt'
     delete_whitespace(jsonName, txtName)
