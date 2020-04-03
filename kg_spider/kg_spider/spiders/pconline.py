@@ -6,7 +6,7 @@ import sys
 class PconlineSpider(scrapy.Spider):
     name = 'pconline'
     # allowed_domains = ['pconline.com.cn']
-    start_urls = ['https://ks.pconline.com.cn/product.shtml?q=%CE%F7%C3%C5%D7%D3']
+    start_urls = ['https://ks.pconline.com.cn/product.shtml?q=%B0%C2%BF%CB%CB%B9']
 
     def parse(self, response):
         # item = PcoItem()
@@ -16,6 +16,9 @@ class PconlineSpider(scrapy.Spider):
                 'name':
                     each.xpath(
                         './/div[@class="item-title"]/a[@class="item-name"]/@title').extract(),
+                'price':
+                    each.xpath(
+                        './/div[@class="item-sales"]/div/a/text()').extract(),
                 'content': each.xpath(
                     './/div[@class="item-title"]/span[@class="item-des"]/text()').extract()
             }
