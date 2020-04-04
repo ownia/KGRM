@@ -2,22 +2,22 @@ from flask import Flask, render_template, request, redirect, abort, jsonify
 from py2neo import Graph
 from collections import OrderedDict
 import pandas as pd
+import json
 
 app = Flask(__name__)
 graph = Graph()
 
 
 def buildNodes(nodeRecord):
-    data = {"id": str(nodeRecord.n._id), "label": next(iter(nodeRecord.n.labels))}
-    data.update(nodeRecord.n.properties)
-    return {"data": data}
+    data = {'id': str(nodeRecord['id(n)'])}
+    return {'data': data}
 
 
 def buildEdges(relationRecord):
-    data = {"source": str(relationRecord.r.start_node._id),
-            "target": str(relationRecord.r.end_node._id),
-            "relationship": relationRecord.r.rel.type}
-    return {"data": data}
+    data = {'source': str(relationRecord['id(k)']),
+            'target': str(relationRecord['id(n)']),
+            'relationship': "生产"}
+    return {'data': data}
 
 
 @app.route('/', methods=("GET", "POST"))
@@ -34,22 +34,27 @@ def index():
             print(df)
         except:
             print('error')
-    return render_template('index.html',
+    node = len(graph.nodes)
+    edge = len(graph)
+    data = "共有" + str(node) + "个节点，" + str(edge) + "个关系"
+    return render_template('index.html', data=data,
                            tables=[df.to_html(classes='table table-dark table-striped')],
                            titles=df.columns.values)
+
+
+@app.route('/graph')
+def get_graph():
+    nodes = list(map(buildNodes, graph.run('MATCH (n:product) WHERE n.title=~".*索尼.*" RETURN id(n) LIMIT 50').data()))
+    nodes.append({'data': {'id': '14'}})
+    edges = list(map(buildEdges, graph.run(
+        'MATCH (n:product) WHERE n.title=~".*索尼.*" MATCH (k)-[r]-(n) RETURN id(n),id(k) LIMIT 50').data()))
+    elements = {'nodes': nodes, 'edges': edges}
+    return jsonify(elements)
 
 
 @app.route('/about')
 def about():
     return render_template('about.html')
-
-
-@app.route('/graph')
-def get_graph():
-    nodes = map(buildNodes, graph.run('MATCH (:class{title:"快递物流品牌"})-[r:RELATION {type :"包括"  }]->(n) RETURN n'))
-    edges = map(buildEdges, graph.run('MATCH (:class{title:"快递物流品牌"})-[r:RELATION {type :"包括"  }]->(n) RETURN r'))
-    data = list({"nodes": nodes, "edges": edges})
-    return jsonify(elements=data)
 
 
 if __name__ == '__main__':

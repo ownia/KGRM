@@ -6,7 +6,7 @@ import sys
 class PconlineSpider(scrapy.Spider):
     name = 'pconline'
     # allowed_domains = ['pconline.com.cn']
-    start_urls = ['https://ks.pconline.com.cn/product.shtml?q=%B0%C2%BF%CB%CB%B9']
+    start_urls = ['https://ks.pconline.com.cn/product.shtml?q=%D6%BE%B8%DF']
 
     def parse(self, response):
         # item = PcoItem()

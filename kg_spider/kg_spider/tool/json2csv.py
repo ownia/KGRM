@@ -48,7 +48,7 @@ def cut_data(jsonName, name):
 
 
 if __name__ == '__main__':
-    name = 'leader'
+    name = 'skyworth'
     jsonName = name + '.json'
     csvName = name + '.csv'
     # json2csv(jsonName, csvName)

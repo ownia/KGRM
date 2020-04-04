@@ -2,7 +2,7 @@
 def addentity(inputfile):
     fp = open(inputfile, "r", encoding="utf-8")
     lines = fp.readlines()
-    str = "小天鹅(LittleSwan),生产,"
+    str = "云米(VIOMI),生产,"
     with open("relation.csv", "w", encoding="utf-8")as f:
         f.write('newNode,relation,product\n')
         for line in lines:
@@ -35,7 +35,7 @@ def kdbind(inputfile):
 
 
 if __name__ == '__main__':
-    data = "littleswan"
+    data = "skyworth"
     inputfile = data + "_name.txt"
     addentity(inputfile)
     append(inputfile)

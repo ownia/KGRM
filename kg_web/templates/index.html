@@ -44,7 +44,27 @@
         <a class="p-2 text-dark" href="/">Home</a>
         <a class="p-2 text-dark" href="/about">About</a>
     </nav>
-    <a class="btn btn-outline-primary" href="#">What's new?</a>
+    <a class="btn btn-outline-primary" href="#" data-toggle="modal" data-target="#myModal">What's new?</a>
+    <!-- 模态框 -->
+    <div class="modal fade" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- 模态框头部 -->
+                <div class="modal-header">
+                    <h4 class="modal-title">统计</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- 模态框主体 -->
+                <div class="modal-body">
+                    {{data}}
+                </div>
+                <!-- 模态框底部 -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!--
@@ -55,6 +75,7 @@
 -->
 
 <div class="container">
+    <!--
     <div class="card-deck mb-3 text-center">
         <div class="card mb-4 shadow-sm">
             <div class="card-header">
@@ -102,7 +123,7 @@
             </div>
         </div>
     </div>
-
+    -->
     <div class="card-deck mb-3 text-center container">
         <form class="form-inline mb-3 input-group" action="#" method="post">
             <div class="input-group-prepend mb-3">
@@ -120,6 +141,14 @@
         {% endfor %}
     </div>
 
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h4 class="display-5">GRAPH</h4>
+    </div>
+</div>
+
+<div id="cy" class=" " style="width: 100%"></div>
+
+<div class="container">
     <footer class="pt-4 my-md-5 pt-md-5 border-top">
         <div class="row">
             <div class="col-12 col-md">
