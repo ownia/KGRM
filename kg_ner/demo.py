@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from pyltp import SentenceSplitter, Segmentor, Postagger, NamedEntityRecognizer, Parser, SementicRoleLabeller
 import os
+import hanlp
 
-if __name__ == '__main__':
+
+def ltp_module():
     LTP_DATA_DIR = 'ltp_data_v3.4.0/'
     cws_model_path = os.path.join(LTP_DATA_DIR, 'cws.model')
     pos_model_path = os.path.join(LTP_DATA_DIR, 'pos.model')
@@ -44,3 +46,14 @@ if __name__ == '__main__':
     # for role in roles:
     #   print(role.index, "".join(
     #        ["%s:(%d,%d)" % (arg.name, arg.range.start, arg.range.end) for arg in role.arguments]))
+
+
+def hanlp_module(data):
+    tokenizer = hanlp.load('PKU_NAME_MERGED_SIX_MONTHS_CONVSEG')
+    print(tokenizer(data))
+
+
+if __name__ == '__main__':
+    # ltp()
+    data = '受旺季高温天气刺激和电商618大促双重影响，本月空调市场规模再攀新高，根据奥维云网（AVC）推总数据显示，2018年6月空调零售额规模为331.5亿元，同比增长19.5%，零售量规模为1004.4万套，同比增长13.7%。其中线上市场top品牌格局出现分化，奥克斯占比大幅度提升，零售额占比达到28.9%，领先第二名品牌7.1%；而线下市场品牌格局依然稳定，格力、美的的份额继续提升，挤压二线品牌的生存空间。'
+    hanlp_module(data)
