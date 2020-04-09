@@ -56,10 +56,3 @@ $(function () {
 
     }, 'json');
 });
-
-var content = document.getElementById("content");
-var contents = content.innerHTML;
-var text = document.getElementById("text");
-var value = text.value;
-var values = contents.split(value);
-content.innerHTML = values.join('<span style="background:red;">' + value + '</span>');

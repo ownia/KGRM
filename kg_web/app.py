@@ -79,10 +79,11 @@ def ner():
     ner_output = "null."
     data2 = []
     text = ""
+    page = ""
     if request.method == "POST":
         ner_post = request.form['ner_post']
         text = ner_post
-        print(ner_post)
+        # print(ner_post)
         try:
             # tokenizer = hanlp.load('PKU_NAME_MERGED_SIX_MONTHS_CONVSEG')
             # ner_output = tokenizer(ner_post)
@@ -97,9 +98,15 @@ def ner():
                     if len(i[0]) > 1:
                         data2.append(i[0])
             ner_output = data2
+            src = str(ner_post)
+            for i in data2:
+                temp = src.replace(str(i), str("<mark>" + i + "</mark>"))
+                src = temp
+            page = "<p>" + src + "</p>"
+            # print(page)
         except:
             print('post error.')
-    return render_template('ner.html', data=data, text=text, ner_output=ner_output)
+    return render_template('ner.html', data=data, text=text, ner_output=ner_output, page=page)
 
 
 @app.errorhandler(404)

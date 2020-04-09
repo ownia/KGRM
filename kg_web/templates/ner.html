@@ -78,11 +78,18 @@
         </form>
     </div>
 
-    <div id="content">
-        {{text}}
-    </div>
-    <div id="text">
-        {{ner_output}}
+    <div class="container">
+        <div>
+            {{text}}
+        </div>
+        <hr class="half-rule">
+        <div>
+            {{ner_output}}
+        </div>
+        <hr class="half-rule">
+        <div id="key">
+            {{page|safe}}
+        </div>
     </div>
 
     <footer class="pt-4 my-md-5 pt-md-5 border-top">
