@@ -76,7 +76,7 @@ def get_ner(list_ner):
 @app.route('/ner', methods=("GET", "POST"))
 def ner():
     data = count()
-    ner_output = "null."
+    ner_output = ""
     data2 = []
     text = ""
     page = ""
