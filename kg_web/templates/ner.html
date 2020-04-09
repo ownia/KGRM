@@ -13,7 +13,6 @@
     <!-- JS file -->
     <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/cytoscape.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <!-- Favicons -->
     <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
@@ -68,88 +67,24 @@
     </div>
 </div>
 
-<!--
-<div>
-    <h1>cytoscape</h1>
-    <div id="cy"></div>
-</div>
--->
-
 <div class="container">
-    <!--
-    <div class="card-deck mb-3 text-center">
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header">
-                <h4 class="my-0 font-weight-normal">Free</h4>
-            </div>
-            <div class="card-body">
-                <h1 class="card-title pricing-card-title">$0 <small class="text-muted">/ mo</small></h1>
-                <ul class="list-unstyled mt-3 mb-4">
-                    <li>10 users included</li>
-                    <li>2 GB of storage</li>
-                    <li>Email support</li>
-                    <li>Help center access</li>
-                </ul>
-                <button type="button" class="btn btn-lg btn-block btn-outline-primary">Sign up for free</button>
-            </div>
-        </div>
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header">
-                <h4 class="my-0 font-weight-normal">Pro</h4>
-            </div>
-            <div class="card-body">
-                <h1 class="card-title pricing-card-title">$15 <small class="text-muted">/ mo</small></h1>
-                <ul class="list-unstyled mt-3 mb-4">
-                    <li>20 users included</li>
-                    <li>10 GB of storage</li>
-                    <li>Priority email support</li>
-                    <li>Help center access</li>
-                </ul>
-                <button type="button" class="btn btn-lg btn-block btn-primary">Get started</button>
-            </div>
-        </div>
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header">
-                <h4 class="my-0 font-weight-normal">Enterprise</h4>
-            </div>
-            <div class="card-body">
-                <h1 class="card-title pricing-card-title">$29 <small class="text-muted">/ mo</small></h1>
-                <ul class="list-unstyled mt-3 mb-4">
-                    <li>30 users included</li>
-                    <li>15 GB of storage</li>
-                    <li>Phone and email support</li>
-                    <li>Help center access</li>
-                </ul>
-                <button type="button" class="btn btn-lg btn-block btn-primary">Contact us</button>
-            </div>
-        </div>
-    </div>
-    -->
     <div class="card-deck mb-3 text-center container">
         <form class="form-inline mb-3 input-group" action="#" method="post">
             <div class="input-group-prepend mb-3">
-                <span class="input-group-text">cypher</span>
+                <span class="input-group-text">Named-entity_recognition</span>
             </div>
-            <input type="text" name="cypher" class="form-control mb-3">
+            <input type="text" name="ner_post" class="form-control mb-3">
             <button class="btn btn-primary mb-3" type="submit">submit</button>
         </form>
     </div>
 
-    <div style="height: 400px; overflow: auto">
-        {% for table in tables %}
-        {{titles[loop.index]}}
-        {{ table|safe }}
-        {% endfor %}
+    <div id="content">
+        {{text}}
+    </div>
+    <div id="text">
+        {{ner_output}}
     </div>
 
-    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-        <h4 class="display-5">GRAPH</h4>
-    </div>
-</div>
-
-<div id="cy" class=" " style="width: 100%"></div>
-
-<div class="container">
     <footer class="pt-4 my-md-5 pt-md-5 border-top">
         <div class="row">
             <div class="col-12 col-md">

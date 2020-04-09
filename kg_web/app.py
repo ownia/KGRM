@@ -3,6 +3,8 @@ from py2neo import Graph
 from collections import OrderedDict
 import pandas as pd
 import json
+import hanlp
+import re
 
 app = Flask(__name__)
 graph = Graph()
@@ -52,9 +54,64 @@ def get_graph():
     return jsonify(elements)
 
 
+def count() -> str:
+    node = len(graph.nodes)
+    edge = len(graph)
+    data = "共有" + str(node) + "个节点，" + str(edge) + "个关系"
+    return str(data)
+
+
 @app.route('/about')
 def about():
-    return render_template('about.html')
+    data = count()
+    return render_template('about.html', data=data)
+
+
+@app.route('/ner_data')
+def get_ner(list_ner):
+    elements = {'word': list_ner}
+    return jsonify(elements)
+
+
+@app.route('/ner', methods=("GET", "POST"))
+def ner():
+    data = count()
+    ner_output = "null."
+    data2 = []
+    text = ""
+    if request.method == "POST":
+        ner_post = request.form['ner_post']
+        text = ner_post
+        print(ner_post)
+        try:
+            # tokenizer = hanlp.load('PKU_NAME_MERGED_SIX_MONTHS_CONVSEG')
+            # ner_output = tokenizer(ner_post)
+            recognizer = hanlp.load(hanlp.pretrained.ner.MSRA_NER_BERT_BASE_ZH)
+            list_data = re.split(r'[，。；\s]\s*', ner_post)
+            data1 = []
+            for li in list_data:
+                data1.append(list(li))
+            ner_output = recognizer(data1)
+            for n in ner_output:
+                for i in n:
+                    if len(i[0]) > 1:
+                        data2.append(i[0])
+            ner_output = data2
+        except:
+            print('post error.')
+    return render_template('ner.html', data=data, text=text, ner_output=ner_output)
+
+
+@app.errorhandler(404)
+def handle_404_error(err_msg):
+    data = count()
+    return render_template('404.html', error=err_msg, data=data)
+
+
+@app.errorhandler(500)
+def handle_500_error(err_msg):
+    data = count()
+    return render_template('500.html', error=err_msg, data=data)
 
 
 if __name__ == '__main__':

@@ -13,7 +13,7 @@
     <!-- JS file -->
     <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/cytoscape.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <!-- Favicons -->
     <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <meta name="theme-color" content="#563d7c">
@@ -41,6 +41,7 @@
     <h5 class="my-0 mr-md-auto font-weight-normal">家电制造服务资源管理系统</h5>
     <nav class="my-2 my-md-0 mr-md-3">
         <a class="p-2 text-dark" href="/">Home</a>
+        <a class="p-2 text-dark" href="/ner">NER</a>
         <a class="p-2 text-dark" href="/about">About</a>
     </nav>
     <a class="btn btn-outline-primary" href="#" data-toggle="modal" data-target="#myModal">What's new?</a>
@@ -50,11 +51,12 @@
             <div class="modal-content">
                 <!-- 模态框头部 -->
                 <div class="modal-header">
-                    <h4 class="modal-title">模态框头部</h4>
+                    <h4 class="modal-title">统计</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <!-- 模态框主体 -->
                 <div class="modal-body">
+                    {{data}}
                 </div>
                 <!-- 模态框底部 -->
                 <div class="modal-footer">
