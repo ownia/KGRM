@@ -10,14 +10,14 @@ app = Flask(__name__)
 graph = Graph()
 
 
-def buildNodes(nodeRecord):
-    data = {'id': str(nodeRecord['id(n)'])}
+def build_nodes(node_record):
+    data = {'id': str(node_record['id(n)'])}
     return {'data': data}
 
 
-def buildEdges(relationRecord):
-    data = {'source': str(relationRecord['id(k)']),
-            'target': str(relationRecord['id(n)']),
+def build_edges(relation_record):
+    data = {'source': str(relation_record['id(k)']),
+            'target': str(relation_record['id(n)']),
             'relationship': "生产"}
     return {'data': data}
 
@@ -39,6 +39,7 @@ def index():
     node = len(graph.nodes)
     edge = len(graph)
     data = "共有" + str(node) + "个节点，" + str(edge) + "个关系"
+
     return render_template('index.html', data=data,
                            tables=[df.to_html(classes='table table-dark table-striped')],
                            titles=df.columns.values)
@@ -46,9 +47,9 @@ def index():
 
 @app.route('/graph')
 def get_graph():
-    nodes = list(map(buildNodes, graph.run('MATCH (n:product) WHERE n.title=~".*索尼.*" RETURN id(n) LIMIT 50').data()))
+    nodes = list(map(build_nodes, graph.run('MATCH (n:product) WHERE n.title=~".*索尼.*" RETURN id(n) LIMIT 50').data()))
     nodes.append({'data': {'id': '14'}})
-    edges = list(map(buildEdges, graph.run(
+    edges = list(map(build_edges, graph.run(
         'MATCH (n:product) WHERE n.title=~".*索尼.*" MATCH (k)-[r]-(n) RETURN id(n),id(k) LIMIT 50').data()))
     elements = {'nodes': nodes, 'edges': edges}
     return jsonify(elements)
