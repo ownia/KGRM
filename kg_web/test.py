@@ -30,7 +30,7 @@ def old():
 
 if __name__ == '__main__':
     graph = Graph()
-    data = graph.run('match (n:newNode)-[r]-(k:newNode) return n,r,k limit 3').data()
+    data = graph.run('match (n:newNode)-[r]-(k:newNode) return n,r,k').data()
     # print(type(data))
     # print(data)
     # for i in data:r'^("[^"]+")([^"]+)("[^"]+")'
@@ -71,3 +71,10 @@ if __name__ == '__main__':
     elements = {'nodes': nodes, 'edges': edges}
     js = json.dumps(elements, ensure_ascii=False)
     print(js)
+
+
+class Solution:
+    def entityParser(self, text: str) -> str:
+        data = text.replace("&quot;", "\"").replace("&apos;", "\'").replace("&amp;", "&").replace("&gt;", ">").replace(
+            "&lt;", "<").replace("&frasl;", "/")
+        return data

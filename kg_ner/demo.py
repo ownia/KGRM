@@ -29,7 +29,7 @@ class HitLtp:
         parser.load(par_model_path)
         # labeller.load(srl_model_path)
 
-        words = segmentor.segment('元芳你怎么看')
+        words = segmentor.segment('格力电器美的造')
         postags = postagger.postag(words)
         netags = recognizer.recognize(words, postags)
         arcs = parser.parse(words, postags)
