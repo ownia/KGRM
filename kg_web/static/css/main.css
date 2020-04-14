@@ -21,7 +21,7 @@ html {
 }
 
 #cy {
-    height: 400px;
+    height: 600px;
     width: 500px;
     border-radius: 20px;
     background: #ffffff;
@@ -56,5 +56,6 @@ html {
 }
 
 #key mark {
-    background-color: #f13148;
+    background-color: #007bff;
+    color: #ffffff;
 }

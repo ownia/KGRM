@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, abort, jsonify
+from flask import Flask, render_template, request, redirect, abort, jsonify, g
 from py2neo import Graph
 from collections import OrderedDict
 import pandas as pd
@@ -8,6 +8,8 @@ import re
 
 app = Flask(__name__)
 graph = Graph()
+ctx = app.app_context()
+ctx.text = 'match (n:newNode)-[r]-(k:newNode) return n,r,k'
 
 
 def build_nodes(node_record):
@@ -24,25 +26,8 @@ def build_edges(relation_record):
 
 @app.route('/', methods=("GET", "POST"))
 def index():
-    pd.set_option('display.float_format', lambda x: '%.4f' % x)
-    df = pd.DataFrame(graph.run(
-        'MATCH (:class{title:"快递物流品牌"})-[r:RELATION {type :"包括"  }]->(n) RETURN n.title, n.registered ORDER BY '
-        'n.registered').to_table())
-    if request.method == "POST":
-        cypher = request.form['cypher']
-        print(cypher)
-        try:
-            df = pd.DataFrame(graph.run(cypher).to_table())
-            print(df)
-        except:
-            print('error')
-    node = len(graph.nodes)
-    edge = len(graph)
-    data = "共有" + str(node) + "个节点，" + str(edge) + "个关系"
-
-    return render_template('index.html', data=data,
-                           tables=[df.to_html(classes='table table-dark table-striped')],
-                           titles=df.columns.values)
+    data = count()
+    return render_template('index.html', data=data)
 
 
 @app.route('/graph')
@@ -52,7 +37,7 @@ def get_graph():
     # edges = list(map(build_edges, graph.run(
     #     'MATCH (n:product) WHERE n.title=~".*索尼.*" MATCH (k)-[r]-(n) RETURN id(n),id(k) LIMIT 50').data()))
     # elements = {'nodes': nodes, 'edges': edges}
-    data1 = graph.run('match (n:newNode)-[r]-(k:newNode) return n,r,k').data()
+    data1 = graph.run(ctx.text).data()
     nodes = []
     edges = []
     for i in data1:
@@ -85,6 +70,39 @@ def get_graph():
                 edges.append({'data': data})
     elements = {'nodes': nodes, 'edges': edges}
     return jsonify(elements)
+
+
+@app.route('/cypher', methods=("GET", "POST"))
+def get_cypher():
+    pd.set_option('display.float_format', lambda x: '%.4f' % x)
+    df = pd.DataFrame(graph.run(
+        'MATCH (:class{title:"快递物流品牌"})-[r:RELATION {type :"包括"  }]->(n) RETURN n.title, n.registered ORDER BY '
+        'n.registered').to_table())
+    if request.method == "POST":
+        cypher = request.form['cypher']
+        print(cypher)
+        try:
+            df = pd.DataFrame(graph.run(cypher).to_table())
+            print(df)
+        except:
+            print('error')
+    data = count()
+    return render_template('cypher.html', data=data,
+                           tables=[df.to_html(classes='table table-dark table-striped')],
+                           titles=df.columns.values)
+
+
+@app.route('/graph_visualization', methods=("GET", "POST"))
+def graph_visualization():
+    data = count()
+    if request.method == "POST":
+        cypher = request.form['graph-cypher']
+        try:
+            ctx.text = cypher
+            print('success')
+        except:
+            print('error')
+    return render_template('graph_visualization.html', data=data)
 
 
 def count() -> str:
