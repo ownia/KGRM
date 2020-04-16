@@ -59,3 +59,109 @@ html {
     background-color: #007bff;
     color: #ffffff;
 }
+
+#banner {
+    background: url("/static/img/background1.jpg") no-repeat;
+    background-size: 100% auto;
+    margin-top: -16px;
+    padding-top: 300px;
+    padding-bottom: 400px;
+    position: relative;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+#banner span {
+    font-size: x-large;
+    font-weight: bold;
+    line-height: 1.5;
+    display: block;
+}
+
+#start-button {
+    margin-top: 10px;
+    font-size: 17px;
+    border-radius: 32px;
+    padding: 12px 30px;
+    display: inline-block;
+    background: #E96656;
+    border: 1px solid #E96656;
+    font-weight: 600;
+    outline: none;
+    color: #fff;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+#type div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+#type ul {
+    position: relative;
+}
+
+#type ul li {
+    list-style: none;
+    margin: 0 10%;
+    font-size: 4em;
+}
+
+#type ul li span {
+    position: relative;
+    top: -2px;
+    left: -10px;
+    color: transparent;
+}
+
+#type ul li:hover span {
+    color: #ef0448;
+}
+
+#type ul li a {
+    position: relative;
+    color: rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+#type ul li a:before {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    color: #1bfaad;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+#type ul:hover li a:before {
+    animation: animate 0.5s steps(11) forwards;
+}
+
+@keyframes animate {
+    0% {
+        width: 396.250px;
+    }
+    100% {
+        width: 0;
+    }
+}
+
+#type ul li:hover a:before {
+    animation: animate2 1.5s steps(10) forwards;
+}
+
+@keyframes animate2 {
+    0% {
+        width: 0;
+    }
+    100% {
+        width: 396.250px;
+    }
+}
