@@ -68,7 +68,8 @@ $(function () {
         cy.on('tap', 'node', function (evt) {
             const node = evt.target;
             document.getElementById('node_data').innerHTML = "节点id：" + node.id()
-                + "<br>" + "节点类别：" + node.data('label') + "<br>" + "节点名称：" + node.data('title');
+                + "<br>" + "节点类别：" + node.data('label') + "<br>" + "节点名称：" + node.data('title')
+                + "<br>" + "节点信息：" + node.data('info');
         });
 
         cy.on('tap', 'edge', function (evt) {

@@ -72,7 +72,7 @@ html {
 }
 
 #banner span {
-    font-size: x-large;
+    font-size: xx-large;
     font-weight: bold;
     line-height: 1.5;
     display: block;
@@ -141,12 +141,12 @@ html {
 }
 
 #type ul:hover li a:before {
-    animation: animate 0.5s steps(11) forwards;
+    animation: animate 0.5s steps(20) forwards;
 }
 
 @keyframes animate {
     0% {
-        width: 396.250px;
+        width: 640px;
     }
     100% {
         width: 0;
@@ -154,7 +154,7 @@ html {
 }
 
 #type ul li:hover a:before {
-    animation: animate2 1.5s steps(10) forwards;
+    animation: animate2 1.5s steps(20) forwards;
 }
 
 @keyframes animate2 {
@@ -162,6 +162,6 @@ html {
         width: 0;
     }
     100% {
-        width: 396.250px;
+        width: 640px;
     }
 }

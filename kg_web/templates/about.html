@@ -43,7 +43,7 @@
         <a class="p-2 text-dark" href="/">Home</a>
         <a class="p-2 text-dark" href="/cypher">Cypher</a>
         <a class="p-2 text-dark" href="/graph_visualization">Graph</a>
-        <a class="p-2 text-dark" href="/ner">NER</a>
+        <a class="p-2 text-dark" href="/ner">DNER</a>
         <a class="p-2 text-dark" href="/about">About</a>
     </nav>
     <a class="btn btn-outline-primary" href="#" data-toggle="modal" data-target="#myModal">What's new?</a>
@@ -75,6 +75,68 @@
 </div>
 
 <div class="container">
+    <hr class="half-rule">
+    <button type="button" class="btn btn-lg btn-block btn-primary">技术栈</button>
+    <br>
+    <div class="card-deck text-center">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">数据爬取及清洗</h4>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mt-3 mb-4">
+                    <li>Chrome Driver</li>
+                    <li>JSON Parsing</li>
+                    <li>Regular Expression</li>
+                    <li>Scrapy</li>
+                    <li>Selenium</li>
+                </ul>
+            </div>
+        </div>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">前端</h4>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mt-3 mb-4">
+                    <li>Bootstrap4</li>
+                    <li>Cytoscape.js</li>
+                    <li>cytoscape-panzoom</li>
+                    <li>Font Awesome</li>
+                    <li>jQuery</li>
+                </ul>
+            </div>
+        </div>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">后端</h4>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mt-3 mb-4">
+                    <li>Flask</li>
+                    <li>HanLP2.0</li>
+                    <li>LTP</li>
+                    <li>Neo4j</li>
+                    <li>py2neo</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <hr class="half-rule">
+    <div>
+        <button type="button" onclick="window.location.href='https://github.com/ownia/KGRM'"
+                class="btn btn-lg btn-block btn-outline-primary">项目地址：https://github.com/ownia/KGRM
+        </button>
+    </div>
+
+    <hr class="half-rule">
+    <div>
+        <button type="button" class="btn btn-lg btn-block btn-primary">数据操作流程图</button>
+        <br>
+        <img src="./static/img/crawl_flowchart.png" style="width: 100%;">
+    </div>
+
     <footer class="pt-4 my-md-5 pt-md-5 border-top">
         <div class="row">
             <div class="col-12 col-md">

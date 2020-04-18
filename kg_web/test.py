@@ -19,6 +19,7 @@ def build_edges(relation_record):
 
 
 def old():
+    graph = Graph()
     nodes = list(map(build_nodes, graph.run('MATCH (n:product) WHERE n.title=~".*索尼.*" RETURN id(n) LIMIT 50').data()))
     nodes.append({'data': {'id': '14'}})
     edges = list(map(build_edges, graph.run(
@@ -28,7 +29,7 @@ def old():
     print(js)
 
 
-if __name__ == '__main__':
+def re_data():
     graph = Graph()
     data = graph.run('match (n:newNode)-[r]-(k:newNode) return n,r,k').data()
     # print(type(data))
@@ -47,13 +48,19 @@ if __name__ == '__main__':
                 id = id_pattern.findall(str(i[e]))
                 label_pattern = re.compile(r':(\w+)')
                 label = label_pattern.findall(str(i[e]))
-                title_pattern = re.compile(r'\'(\S+)\'')
+                title_pattern = re.compile(r'title: \'(\S+)\'')
                 title = title_pattern.findall(str(i[e]))
-                t = eval(repr(title).replace('\\\\', '\\'))
-                s = str(t).replace("['", "").replace("']", "")
+                t_title = eval(repr(title).replace('\\\\', '\\'))
+                s_title = str(t_title).replace("['", "").replace("']", "")
+
+                info_pattern = re.compile(r'\"(.+)\"')
+                info = info_pattern.findall(str(i[e]))
+                t_info = eval(repr(info).replace('\\\\', '\\'))
+                s_info = str(t_info).replace("['", "").replace("']", "")
+
                 data = {'id': str(id).replace("['", "").replace("']", ""),
                         'label': str(label).replace("['", "").replace("']", ""),
-                        'title': s}
+                        'title': s_title, 'info': s_info}
                 nodes.append({'data': data})
             else:
                 target_pattern = re.compile(r'_(\d+)\)-')
@@ -78,3 +85,7 @@ class Solution:
         data = text.replace("&quot;", "\"").replace("&apos;", "\'").replace("&amp;", "&").replace("&gt;", ">").replace(
             "&lt;", "<").replace("&frasl;", "/")
         return data
+
+
+if __name__ == '__main__':
+    print("ok.")

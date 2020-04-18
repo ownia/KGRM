@@ -45,15 +45,21 @@ def get_graph():
             if 'title' in i[e]:
                 id_pattern = re.compile(r'_(\d+):')
                 id = id_pattern.findall(str(i[e]))
-                label_pattern = re.compile(r':(\w+)')
+                label_pattern = re.compile(r':(\w+) {')
                 label = label_pattern.findall(str(i[e]))
-                title_pattern = re.compile(r'\'(\S+)\'')
+                title_pattern = re.compile(r'title: \'(\S+)\'')
                 title = title_pattern.findall(str(i[e]))
-                t = eval(repr(title).replace('\\\\', '\\'))
-                s = str(t).replace("['", "").replace("']", "")
+                t_title = eval(repr(title).replace('\\\\', '\\'))
+                s_title = str(t_title).replace("['", "").replace("']", "")
+
+                info_pattern = re.compile(r'info: \'(.+),')
+                info = info_pattern.findall(str(i[e]))
+                t_info = eval(repr(info).replace('\\\\', '\\'))
+                s_info = str(t_info).replace("['", "").replace("']", "")
+
                 data = {'id': str(id).replace("['", "").replace("']", ""),
                         'label': str(label).replace("['", "").replace("']", ""),
-                        'title': s}
+                        'title': s_title, 'info': s_info}
                 nodes.append({'data': data})
             else:
                 target_pattern = re.compile(r'_(\d+)\)-')
