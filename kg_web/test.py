@@ -89,7 +89,7 @@ class Solution:
         return data
 
 
-def Jaccard(terms_model, reference):
+def jaccard_coefficient(terms_model, reference):
     grams_reference = set(reference)
     grams_model = set(terms_model)
     temp = 0
@@ -97,8 +97,8 @@ def Jaccard(terms_model, reference):
         if i in grams_model:
             temp = temp + 1
     dis = len(grams_model) + len(grams_reference) - temp
-    jaccard_coefficient = float(temp / dis)
-    return jaccard_coefficient
+    jaccard_res = float(temp / dis)
+    return jaccard_res
 
 
 def dice_coefficient(a, b):
@@ -138,6 +138,8 @@ if __name__ == '__main__':
     data = session.run("MATCH (m)-[r]->(n) RETURN m.title, r.relation, n.title LIMIT 100")
     # print(data)
     blists = []
+    out_j = []
+    out_d = []
     for d in data:
         bs = str(d[0])
         blists.append(bs)
@@ -145,10 +147,20 @@ if __name__ == '__main__':
         for j in range(0, i):
             a = blists[i]
             b = blists[j]
-            td = Jaccard(a, b)
+            td_j = jaccard_coefficient(a, b)
+            td_d = dice_coefficient(a, b)
             std = edit_distance(a, b) / max(len(a), len(b))
             fy = 1 - std
-            avg = (td + fy) / 2
-            if avg < 1:
-                print(blists[i], blists[j])
-                print('avg_sim: ', avg)
+            avg_j = (td_j + fy) / 2
+            avg_d = (td_d + fy) / 2
+            if avg_j < 1:
+                # print(blists[i], blists[j])
+                # print('avg_sim: ', avg_j)
+                out_j.append(blists[i] + " " + blists[j] + " " + str(avg_j))
+            if avg_d < 1:
+                out_d.append(blists[i] + " " + blists[j] + " " + str(avg_d))
+        list_j = list(set(out_j))
+        list_d = list(set(out_d))
+        list_j.sort()
+        list_d.sort()
+        print(list_j)

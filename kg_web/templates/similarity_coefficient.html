@@ -16,7 +16,6 @@
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/cytoscape.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/cytoscape-panzoom.js') }}"></script>
     <!-- Favicons -->
     <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <meta name="theme-color" content="#563d7c">
@@ -79,24 +78,35 @@
     <h4 class="display-5">Similarity Coefficient</h4>
 </div>
 
+<div class="container text-center">
+    {{html_text|safe}}
+</div>
+
+<!--
 <div>
-    <div style="width:50%;float:left">
+    <div style="width:33%;float:left">
         <h5>Jaccard</h5>
         {% for j in text_j %}
         {{text_j[loop.index]}}
         <br>
         {% endfor %}
     </div>
-    <div style="width:50%;float:left">
+    <div style="width:33%;float:left">
         <h5>Dice</h5>
         {% for d in text_d %}
         {{text_d[loop.index]}}
         <br>
         {% endfor %}
     </div>
+    <div style="width:33%;float:left">
+        <h5>Ochiai</h5>
+        {% for o in text_o %}
+        {{text_o[loop.index]}}
+        <br>
+        {% endfor %}
+    </div>
 </div>
 
-<!--
 <div class="container">
     <footer class="pt-4 my-md-5 pt-md-5 border-top">
         <div class="row">

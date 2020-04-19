@@ -165,3 +165,12 @@ html {
         width: 640px;
     }
 }
+
+.sim-coe-list {
+    table-layout: auto;
+    width: 100%;
+}
+
+.sim-coe-list th{
+    text-align: center;
+}

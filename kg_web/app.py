@@ -168,7 +168,7 @@ def ner():
     return render_template('ner.html', data=data, text=text, ner_output=ner_output, page=page)
 
 
-def Jaccard(terms_model, reference):
+def jaccard_coefficient(terms_model, reference):
     grams_reference = set(reference)
     grams_model = set(terms_model)
     temp = 0
@@ -176,16 +176,30 @@ def Jaccard(terms_model, reference):
         if i in grams_model:
             temp = temp + 1
     dis = len(grams_model) + len(grams_reference) - temp
-    jaccard_coefficient = float(temp / dis)
-    return jaccard_coefficient
+    jaccard_res = float(temp / dis)
+    return jaccard_res
 
 
 def dice_coefficient(a, b):
-    """dice coefficient 2nt/na + nb."""
     a_bigrams = set(a)
     b_bigrams = set(b)
     overlap = len(a_bigrams & b_bigrams)
     return overlap * 2.0 / (len(a_bigrams) + len(b_bigrams))
+
+
+def ochiai_coefficient(a, b):
+    a_bigrams = set(a)
+    b_bigrams = set(b)
+    len_a = len(a_bigrams)
+    len_b = len(b_bigrams)
+    temp = 0
+    for i in b_bigrams:
+        if i in a_bigrams:
+            temp = temp + 1
+    overlap = temp
+    # union = pow(pow(len_a, 1 / len_a) * pow(len_b, 1 / len_b), 1 / 2)
+    union = pow(len_a * len_b, 1 / 2)
+    return float(overlap / union)
 
 
 def edit_distance(word1, word2):
@@ -213,11 +227,12 @@ def sim_coe():
     uri = "bolt://localhost:7687"
     driver = GraphDatabase.driver(uri, auth=("neo4j", "password"))
     session = driver.session()
-    data = session.run("MATCH (m)-[r]->(n) RETURN m.title, r.relation, n.title LIMIT 100")
+    data = session.run("MATCH (m)-[r]->(n) RETURN m.title, r.relation, n.title LIMIT 200")
     # print(data)
     blists = []
     out_j = []
     out_d = []
+    out_o = []
     for d in data:
         bs = str(d[0])
         blists.append(bs)
@@ -225,23 +240,46 @@ def sim_coe():
         for j in range(0, i):
             a = blists[i]
             b = blists[j]
-            td_j = Jaccard(a, b)
+            td_j = jaccard_coefficient(a, b)
             td_d = dice_coefficient(a, b)
+            td_o = ochiai_coefficient(a, b)
             std = edit_distance(a, b) / max(len(a), len(b))
             fy = 1 - std
             avg_j = (td_j + fy) / 2
             avg_d = (td_d + fy) / 2
+            avg_o = (td_o + fy) / 2
             if avg_j < 1:
                 # print(blists[i], blists[j])
                 # print('avg_sim: ', avg_j)
-                out_j.append(blists[i] + " " + blists[j] + " " + str(avg_j))
+                # out_j.append(blists[i] + " " + blists[j] + " " + str(avg_j))
+                out_j.append((blists[i], blists[j], str(avg_j)))
             if avg_d < 1:
-                out_d.append(blists[i] + " " + blists[j] + " " + str(avg_d))
+                # out_d.append(blists[i] + " " + blists[j] + " " + str(avg_d))
+                out_d.append((blists[i], blists[j], str(avg_d)))
+            if avg_o < 1:
+                # out_o.append(blists[i] + " " + blists[j] + " " + str(avg_o))
+                out_o.append((blists[i], blists[j], str(avg_o)))
     list_j = list(set(out_j))
     list_d = list(set(out_d))
-    list_j.sort(key=take_third)
-    list_d.sort(key=take_third)
-    return render_template('similarity_coefficient.html', data=data, text_j=list_j, text_d=list_d)
+    list_o = list(set(out_o))
+    list_j.sort()
+    list_d.sort()
+    list_o.sort()
+
+    df = pd.DataFrame(columns=('entity1', 'entity2', 'jaccard', 'dice', 'ochiai'))
+    for i in range(len(list_j)):
+        print(list_d[i][2])
+        # df.append([{'entity1': list_j[i][0], 'entity2': list_j[i][1], 'jaccard': list_j[i][2], 'dice': list_d[i][2],
+        #             'ochiai': list_o[i][2]}], ignore_index=True)
+        df.loc[i] = [list_j[i][0], list_j[i][1], format(float(list_j[i][2]), '.8f'), format(float(list_d[i][2]), '.8f'),
+                     format(float(list_o[i][2]), '.8f')]
+
+    # list_sum = {'jaccard': list_j, 'dice': list_d, 'ochiai': list_o}
+    # df = pd.DataFrame(list_sum)
+    # html_text = df.to_html()
+
+    return render_template('similarity_coefficient.html', data=data,
+                           html_text=df.to_html(classes='sim-coe-list'))
 
 
 @app.errorhandler(404)
