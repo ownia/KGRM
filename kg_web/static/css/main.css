@@ -171,6 +171,28 @@ html {
     width: 100%;
 }
 
-.sim-coe-list th{
+.sim-coe-list th {
     text-align: center;
+}
+
+.illustration div {
+}
+
+.illustration span {
+    width: 45%;
+    height: 42vw;
+    font-size: 4em;
+    font-weight: bold;
+    float: left;
+    margin-left: 5%;
+    display: flex;
+    align-items: center;
+    margin-bottom: 2%;
+}
+
+.illustration img {
+    width: 45%;
+    float: right;
+    margin-right: 5%;
+    margin-bottom: 2%;
 }

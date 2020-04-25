@@ -105,3 +105,4 @@ function node_btn() {
     })
 }
 */
+// document.getElementById("slogan").style.height = document.getElementById("img").offsetHeight + "px";
