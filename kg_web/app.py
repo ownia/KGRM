@@ -223,7 +223,7 @@ def take_third(elem):
 
 @app.route('/similarity_coefficient')
 def sim_coe():
-    data = count()
+    data_count = count()
     uri = "bolt://localhost:7687"
     driver = GraphDatabase.driver(uri, auth=("neo4j", "password"))
     session = driver.session()
@@ -266,9 +266,9 @@ def sim_coe():
     list_d.sort()
     list_o.sort()
 
-    df = pd.DataFrame(columns=('entity1', 'entity2', 'jaccard', 'dice', 'ochiai'))
+    df = pd.DataFrame(columns=('Entity1', 'Entity2', 'Jaccard', 'Dice', 'Ochiai'))
     for i in range(len(list_j)):
-        print(list_d[i][2])
+        # print(list_d[i][2])
         # df.append([{'entity1': list_j[i][0], 'entity2': list_j[i][1], 'jaccard': list_j[i][2], 'dice': list_d[i][2],
         #             'ochiai': list_o[i][2]}], ignore_index=True)
         df.loc[i] = [list_j[i][0], list_j[i][1], format(float(list_j[i][2]), '.8f'), format(float(list_d[i][2]), '.8f'),
@@ -278,8 +278,34 @@ def sim_coe():
     # df = pd.DataFrame(list_sum)
     # html_text = df.to_html()
 
-    return render_template('similarity_coefficient.html', data=data,
-                           html_text=df.to_html(classes='sim-coe-list'))
+    jaccard = []
+    dice = []
+    ochiai = []
+    for i in range(len(list_j)):
+        jaccard.append(float(list_j[i][2]))
+    for i in range(len(list_d)):
+        dice.append(float(list_d[i][2]))
+    for i in range(len(list_o)):
+        ochiai.append(float(list_o[i][2]))
+    jaccard_mean = np.mean(jaccard)
+    jaccard_var = np.var(jaccard)
+    jaccard_std = np.std(jaccard, ddof=1)
+    dice_mean = np.mean(dice)
+    dice_var = np.var(dice)
+    dice_std = np.std(dice, ddof=1)
+    ochiai_mean = np.mean(ochiai)
+    ochiai_var = np.var(ochiai)
+    ochiai_std = np.std(ochiai, ddof=1)
+    df2 = pd.DataFrame(columns=('Name', 'Mean', 'Variance', 'Standard Deviation'))
+    df2.loc[0] = ['Jaccard', format(float(jaccard_mean), '.8f'), format(float(jaccard_var), '.8f'),
+                  format(float(jaccard_std), '.8f')]
+    df2.loc[1] = ['Dice', format(float(dice_mean), '.8f'), format(float(dice_var), '.8f'),
+                  format(float(dice_std), '.8f')]
+    df2.loc[2] = ['Ochiai', format(float(ochiai_mean), '.8f'), format(float(ochiai_var), '.8f'),
+                  format(float(ochiai_std), '.8f')]
+
+    return render_template('similarity_coefficient.html', data=data_count,
+                           html_text=df.to_html(classes='sim-coe-list'), sim_list=df2.to_html(classes='sim-coe-list'))
 
 
 @app.errorhandler(404)
