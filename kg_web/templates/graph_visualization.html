@@ -52,6 +52,7 @@
         <a class="p-2 text-dark" href="/graph_visualization">Graph</a>
         <a class="p-2 text-dark" href="/ner">DNER</a>
         <a class="p-2 text-dark" href="/similarity_coefficient">Sim-Coe</a>
+        <a class="p-2 text-dark" href="/evaluation_index">Eva-Index</a>
         <a class="p-2 text-dark" href="/about">About</a>
     </nav>
     <a class="btn btn-outline-primary" href="#" data-toggle="modal" data-target="#myModal">What's new?</a>
@@ -158,9 +159,14 @@
 </div>
 
 <div class="row container-fluid" style="margin: unset;padding: unset">
-    <div id="cy" style="width: 63%;margin-left:1%;float: left"></div>
+    <div id="cy_tree" style="width: 19%;margin-left:1%;float: right;">
+        <div class="alert alert-info" style="margin-top: 2%;margin-right: 2%;margin-left: 2%">
+            <strong>tree</strong>
+        </div>
+    </div>
+    <div id="cy" style="width: 58%;margin-left:1%;float: left"></div>
     <div style="width: 1%"></div>
-    <div id="cy_data" style="width: 34%;margin-right:1%;float: right;">
+    <div id="cy_data" style="width: 19%;margin-right:1%;float: right;">
         <div class="alert alert-info" style="margin-top: 2%;margin-right: 2%;margin-left: 2%">
             <strong>信息</strong>
             <p id="node_data" style="margin-top: 1%"></p>

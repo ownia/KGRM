@@ -7,6 +7,8 @@ import hanlp
 import re
 import numpy as np
 from neo4j import GraphDatabase, basic_auth, kerberos_auth, custom_auth, TRUST_ALL_CERTIFICATES
+import synonyms
+import heapq
 
 app = Flask(__name__)
 graph = Graph()
@@ -92,8 +94,8 @@ def get_cypher():
         try:
             df = pd.DataFrame(graph.run(cypher).to_table())
             print(df)
-        except:
-            print('error')
+        except BaseException as e:
+            print('error: ' + str(e))
     data = count()
     return render_template('cypher.html', data=data,
                            tables=[df.to_html(classes='table table-dark table-striped')],
@@ -108,8 +110,8 @@ def graph_visualization():
         try:
             ctx.text = cypher
             print('success')
-        except:
-            print('error')
+        except BaseException as e:
+            print('error: ' + str(e))
     return render_template('graph_visualization.html', data=data)
 
 
@@ -163,8 +165,8 @@ def ner():
                 src = temp
             page = "<p>" + src + "</p>"
             # print(page)
-        except:
-            print('post error.')
+        except BaseException as e:
+            print('error: ' + str(e))
     return render_template('ner.html', data=data, text=text, ner_output=ner_output, page=page)
 
 
@@ -306,6 +308,54 @@ def sim_coe():
 
     return render_template('similarity_coefficient.html', data=data_count,
                            html_text=df.to_html(classes='sim-coe-list'), sim_list=df2.to_html(classes='sim-coe-list'))
+
+
+@app.route('/evaluation_index', methods=("GET", "POST"))
+def eva_index():
+    data = count()
+    if request.method == "POST":
+        try:
+            eva_text = request.form['eva_post']
+            # print(eva_text)
+            eva_recognizer = hanlp.load(hanlp.pretrained.ner.MSRA_NER_BERT_BASE_ZH)
+            list_data = re.split(r'[，。；,\s]\s*', eva_text)
+            eva_list1 = []
+            eva_list2 = []
+            for li in list_data:
+                eva_list1.append(list(li))
+            eva_output = eva_recognizer(eva_list1)
+            for n in eva_output:
+                for i in n:
+                    if len(i[0]) > 1:
+                        eva_list2.append(i[0])
+            print(eva_list2)
+            entity_list = []
+            for i in eva_list2:
+                eva_pattern = re.compile(str(i) + r'[a-zA-Z0-9-_]+')
+                eva_target = eva_pattern.findall(eva_text)
+                # print(eva_target)
+                if len(eva_target) > 0:
+                    for j in eva_target:
+                        entity_list.append(j)
+            print(entity_list)
+            data_list = []
+            with open("node.txt", "r", encoding="utf-8") as f:
+                for line in f:
+                    data_list.append(line.strip("\n"))
+            eva_input = []
+            for sen1 in entity_list:
+                data_dict = {}
+                for sen2 in data_list:
+                    r = synonyms.compare(sen1, sen2, seg=True)
+                    data_dict[str(sen2)] = r
+                max_n = heapq.nlargest(5, data_dict.items(), key=lambda x: x[1])
+                eva_input.extend(max_n)
+            del data_list[:]
+
+        except BaseException as e:
+            print('error: ' + str(e))
+
+    return render_template('evaluation_index.html', data=data)
 
 
 @app.errorhandler(404)

@@ -32,8 +32,16 @@ $(function () {
     $.get('/graph', function (result) {
         var style = [
             {
-                selector: 'node',
+                selector: 'node[label = "product"]',
+                css: {'background-color': '#ff6666', 'content': 'data(id)'}
+            },
+            {
+                selector: 'node[label = "newNode"]',
                 css: {'background-color': '#007bff', 'content': 'data(id)'}
+            },
+            {
+                selector: 'node[label = "class"]',
+                css: {'background-color': '#ffcb32', 'content': 'data(id)'}
             },
             {
                 selector: 'edge',
