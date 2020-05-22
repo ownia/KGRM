@@ -9,6 +9,10 @@ import numpy as np
 from neo4j import GraphDatabase, basic_auth, kerberos_auth, custom_auth, TRUST_ALL_CERTIFICATES
 import synonyms
 import heapq
+from typing import List
+
+# import warnings
+# warnings.filterwarnings("ignore")
 
 app = Flask(__name__)
 graph = Graph()
@@ -310,11 +314,30 @@ def sim_coe():
                            html_text=df.to_html(classes='sim-coe-list'), sim_list=df2.to_html(classes='sim-coe-list'))
 
 
+def combination(node: List[str]):
+    result = []
+    for i in range(len(node)):
+        temp = i + 1
+        for j in range(len(node) - i - 1):
+            # print(node[i] + ", " + node[temp])
+            result.append([node[i], node[temp]])
+            temp += 1
+    return result
+
+
 @app.route('/evaluation_index', methods=("GET", "POST"))
 def eva_index():
     data = count()
+    e_index = []
     if request.method == "POST":
         try:
+            """
+            step1: 
+                获取eva_post数据
+                使用正则表达式切割数据
+                使用MSRA_NER_BERT_BASE_ZH模型进行命名实体识别
+                将m个实体存储在eva_list2列表中
+            """
             eva_text = request.form['eva_post']
             # print(eva_text)
             eva_recognizer = hanlp.load(hanlp.pretrained.ner.MSRA_NER_BERT_BASE_ZH)
@@ -328,7 +351,15 @@ def eva_index():
                 for i in n:
                     if len(i[0]) > 1:
                         eva_list2.append(i[0])
-            print(eva_list2)
+            # print(eva_list2)
+            """
+            step2:
+                针对可能存在的节点label类型为product的实体进行正则表达式匹配
+                读取本地node数据文件
+                对n个节点数据进行近义词匹配获得5n个数据
+                对m个数据进行neo4j模糊查询获得k个数据
+                获得5n+k个匹配数据
+            """
             entity_list = []
             for i in eva_list2:
                 eva_pattern = re.compile(str(i) + r'[a-zA-Z0-9-_]+')
@@ -337,12 +368,20 @@ def eva_index():
                 if len(eva_target) > 0:
                     for j in eva_target:
                         entity_list.append(j)
-            print(entity_list)
+            eva_input = []
+            uri = "bolt://localhost:7687"
+            driver = GraphDatabase.driver(uri, auth=("neo4j", "password"), encrypted=False)
+            session = driver.session()
+            for i in eva_list2:
+                cypher = 'MATCH(n) WHERE n.title =~\'.*' + str(i) + '.*\' RETURN n.title LIMIT 1'
+                se = session.run(cypher)
+                for d in se:
+                    eva_input.append(str(d[0]))
+            # print(entity_list)
             data_list = []
             with open("node.txt", "r", encoding="utf-8") as f:
                 for line in f:
                     data_list.append(line.strip("\n"))
-            eva_input = []
             for sen1 in entity_list:
                 data_dict = {}
                 for sen2 in data_list:
@@ -351,11 +390,22 @@ def eva_index():
                 max_n = heapq.nlargest(5, data_dict.items(), key=lambda x: x[1])
                 eva_input.extend(max_n)
             del data_list[:]
-
+            """
+            step3:
+                对5n+k个匹配数据构建combination关系
+                执行相似度算法和链接预测算法
+                    相似度算法
+                        Jaccard, Dice, Ochiai, Edit Distance, Pearson, Euclidean
+                    链接预测算法
+                        AdamicAdar
+                将算法结果经过模型进行权重和偏置处理
+                将evaluation_index执行归一化处理
+            """
+            e_index = combination(eva_input)
         except BaseException as e:
             print('error: ' + str(e))
 
-    return render_template('evaluation_index.html', data=data)
+    return render_template('evaluation_index.html', data=data, index=e_index)
 
 
 @app.errorhandler(404)

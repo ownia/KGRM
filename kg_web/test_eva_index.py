@@ -19,13 +19,17 @@ def old():
 
 
 def combination(node: List[str]):
+    res = []
     for i in range(len(node)):
         temp = i + 1
         for j in range(len(node) - i - 1):
             print(node[i] + ", " + node[temp])
+            res.append([node[i], node[temp]])
             temp += 1
+    return res
 
 
 if __name__ == '__main__':
     text = ["0", "1", "2", "3", "4"]
-    combination(text)
+    res = combination(text)
+    print(res)
