@@ -329,6 +329,9 @@ def combination(node: List[str]):
 def eva_index():
     data = count()
     e_index = []
+    max_n_total = []  # synonyms值集合
+    similarity_value = []
+    link_prediction_value = []
     if request.method == "POST":
         try:
             """
@@ -383,12 +386,15 @@ def eva_index():
                 for line in f:
                     data_list.append(line.strip("\n"))
             for sen1 in entity_list:
+                # print(sen1)
                 data_dict = {}
                 for sen2 in data_list:
                     r = synonyms.compare(sen1, sen2, seg=True)
                     data_dict[str(sen2)] = r
                 max_n = heapq.nlargest(5, data_dict.items(), key=lambda x: x[1])
-                eva_input.extend(max_n)
+                max_n_total.append(max_n)
+                for i in range(len(max_n)):
+                    eva_input.append(max_n[i][0])
             del data_list[:]
             """
             step3:
@@ -401,11 +407,26 @@ def eva_index():
                 将算法结果经过模型进行权重和偏置处理
                 将evaluation_index执行归一化处理
             """
+            # print(eva_input)
             e_index = combination(eva_input)
+            for i in e_index:
+                cypher = 'MATCH (p1:product {title: "' \
+                         + str(i[0]) + '"})-[]-(cuisine1) ' \
+                                       'WITH p1, collect(id(cuisine1)) AS p1Cuisine ' \
+                                       'MATCH (p2:product {title: "' \
+                         + str(i[1]) + '"})-[]-(cuisine2) ' \
+                                       'WITH p1, p1Cuisine, p2, collect(id(cuisine2)) AS p2Cuisine ' \
+                                       'RETURN p1.title AS from, p2.title AS to, ' \
+                                       'gds.alpha.similarity.jaccard(p1Cuisine, p2Cuisine) AS similarity'
+                se = session.run(cypher)
+                for d in se:
+                    similarity_value.append(d)
+
         except BaseException as e:
             print('error: ' + str(e))
 
-    return render_template('evaluation_index.html', data=data, index=e_index)
+    return render_template('evaluation_index.html', data=data, index=e_index, max_n_total=max_n_total,
+                           similarity_value=similarity_value, link_prediction_value=link_prediction_value)
 
 
 @app.errorhandler(404)
