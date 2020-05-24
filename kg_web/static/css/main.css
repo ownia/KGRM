@@ -162,7 +162,7 @@ html {
 
 @keyframes animate {
     0% {
-        width: 640px;
+        width: 896px;
     }
     100% {
         width: 0;
@@ -178,7 +178,7 @@ html {
         width: 0;
     }
     100% {
-        width: 640px;
+        width: 896px;
     }
 }
 
@@ -212,4 +212,23 @@ html {
     float: right;
     margin-right: 5%;
     margin-bottom: 2%;
+}
+
+a {
+}
+
+.active {
+    color: #a71d2a;
+    border-bottom-color: #a71d2a;
+    border-bottom: 1px solid;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.active:focus {
+    color: #a71d2a;
+    border-bottom-color: #a71d2a;
+    border-bottom: 1px solid;
+    cursor: pointer;
+    text-decoration: none;
 }

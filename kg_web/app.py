@@ -88,6 +88,7 @@ def get_graph():
 
 @app.route('/cypher', methods=("GET", "POST"))
 def get_cypher():
+    text = ""
     pd.set_option('display.float_format', lambda x: '%.4f' % x)
     df = pd.DataFrame(graph.run(
         'MATCH (:class{title:"快递物流品牌"})-[r:RELATION {type :"包括"  }]->(n) RETURN n.title, n.registered ORDER BY '
@@ -98,25 +99,28 @@ def get_cypher():
         try:
             df = pd.DataFrame(graph.run(cypher).to_table())
             print(df)
+            text = cypher
         except BaseException as e:
             print('error: ' + str(e))
     data = count()
     return render_template('cypher.html', data=data,
                            tables=[df.to_html(classes='table table-dark table-striped')],
-                           titles=df.columns.values)
+                           titles=df.columns.values, text=text)
 
 
 @app.route('/graph_visualization', methods=("GET", "POST"))
 def graph_visualization():
     data = count()
+    text = ""
     if request.method == "POST":
         cypher = request.form['graph-cypher']
         try:
             ctx.text = cypher
+            text = cypher
             print('success')
         except BaseException as e:
             print('error: ' + str(e))
-    return render_template('graph_visualization.html', data=data)
+    return render_template('graph_visualization.html', data=data, text=text)
 
 
 def count() -> str:
@@ -219,7 +223,7 @@ def edit_distance(word1, word2):
     for i in range(1, len1 + 1):
         for j in range(1, len2 + 1):
             delta = 0 if word1[i - 1] == word2[j - 1] else 1
-    dp[i][j] = min(dp[i - 1][j - 1] + delta, min(dp[i - 1][j] + 1, dp[i][j - 1] + 1))
+            dp[i][j] = min(dp[i - 1][j - 1] + delta, min(dp[i - 1][j] + 1, dp[i][j - 1] + 1))
     return dp[len1][len2]
 
 
