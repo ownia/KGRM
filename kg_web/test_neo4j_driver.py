@@ -2,6 +2,8 @@ from neo4j import GraphDatabase
 from py2neo import Graph
 import pandas as pd
 import json
+import time
+from py2neo import Graph
 
 
 def old():
@@ -47,6 +49,39 @@ def new_test():
         print(d[2])
 
 
+def gds_test():
+    uri = "bolt://localhost:7687"
+    driver = GraphDatabase.driver(uri, auth=("neo4j", "password"), encrypted=False)
+    session = driver.session()
+    cypher = 'MATCH (p1 {title: "' \
+             + '海尔BCD-458WDVMU1' + '"})-[]-() ' \
+                                   'MATCH (p2 {title: "' \
+             + "格力(GREE)" + '"})-[]-() ' \
+                                 'RETURN gds.alpha.linkprediction.commonNeighbors(p1, p2) LIMIT 1'
+    se = session.run(cypher)
+    for i in se:
+        print(i[0])
+
+
+def gds_test_2():
+    graph = Graph()
+    cypher = 'MATCH (p1 {title: "' \
+             + '海尔BCD-458WDVMU1' + '"})-[]-() ' \
+                                   'MATCH (p2 {title: "' \
+             + "格力(GREE)" + '"})-[]-() ' \
+                                 'RETURN gds.alpha.linkprediction.commonNeighbors(p1, p2) LIMIT 1'
+    se = graph.run(cypher).data()
+    print(se)
+
+
 if __name__ == '__main__':
     # eva_index_cypher_test()
-    new_test()
+    # new_test()
+    start = time.perf_counter()
+    gds_test()
+    end = time.perf_counter()
+    print(end - start)
+    start = time.perf_counter()
+    gds_test_2()
+    end = time.perf_counter()
+    print(end - start)

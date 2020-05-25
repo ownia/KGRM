@@ -10,6 +10,7 @@ from neo4j import GraphDatabase, basic_auth, kerberos_auth, custom_auth, TRUST_A
 import synonyms
 import heapq
 from typing import List
+import time
 
 # import warnings
 # warnings.filterwarnings("ignore")
@@ -346,6 +347,7 @@ def eva_index():
                 将m个实体存储在eva_list2列表中
             """
             eva_text = request.form['eva_post']
+            start = time.perf_counter()
             # print(eva_text)
             eva_recognizer = hanlp.load(hanlp.pretrained.ner.MSRA_NER_BERT_BASE_ZH)
             list_data = re.split(r'[，。；,\s]\s*', eva_text)
@@ -376,6 +378,7 @@ def eva_index():
                     for j in eva_target:
                         entity_list.append(j)
             eva_input = []
+            # test = []
             uri = "bolt://localhost:7687"
             driver = GraphDatabase.driver(uri, auth=("neo4j", "password"), encrypted=False)
             session = driver.session()
@@ -383,6 +386,7 @@ def eva_index():
                 cypher = 'MATCH(n) WHERE n.title =~\'.*' + str(i) + '.*\' RETURN n.title LIMIT 1'
                 se = session.run(cypher)
                 for d in se:
+                    # test.append(str(d[0]))
                     eva_input.append(str(d[0]))
             # print(entity_list)
             data_list = []
@@ -413,18 +417,83 @@ def eva_index():
             """
             # print(eva_input)
             e_index = combination(eva_input)
+            # Jaccard
+            """
             for i in e_index:
-                cypher = 'MATCH (p1:product {title: "' \
+                cypher = 'MATCH (p1 {title: "' \
                          + str(i[0]) + '"})-[]-(cuisine1) ' \
                                        'WITH p1, collect(id(cuisine1)) AS p1Cuisine ' \
-                                       'MATCH (p2:product {title: "' \
+                                       'MATCH (p2 {title: "' \
                          + str(i[1]) + '"})-[]-(cuisine2) ' \
                                        'WITH p1, p1Cuisine, p2, collect(id(cuisine2)) AS p2Cuisine ' \
                                        'RETURN p1.title AS from, p2.title AS to, ' \
                                        'gds.alpha.similarity.jaccard(p1Cuisine, p2Cuisine) AS similarity'
                 se = session.run(cypher)
                 for d in se:
-                    similarity_value.append(d)
+                    similarity_value.append("Jaccard " + str(d[2]))            
+            """
+            # Pearson
+            """
+            for i in e_index:
+                cypher = 'MATCH (p1:product {title: "' \
+                         + str(i[0]) + '"})-[]-(cuisine1) ' \
+                                       'WITH p1, gds.alpha.similarity.asVector(cuisine1,p1.registered) AS p1Vector ' \
+                                       'MATCH (p2:product {title: "' \
+                         + str(i[1]) + '"})-[]-(cuisine2) ' \
+                                       'WITH p1, p2, p1Vector, gds.alpha.similarity.asVector(cuisine2,p2.registered) ' \
+                                       'AS p2Vector ' \
+                                       'RETURN p1.title AS from, p2.title AS to, ' \
+                                       'gds.alpha.similarity.pearson(p1Vector, p2Vector, {vectorType: "maps"}) AS ' \
+                                       'similarity '
+                se = session.run(cypher)
+                for d in se:
+                    similarity_value.append("Pearson" + str(d[2]) + "<br>")
+            """
+            for i in e_index:
+                # Jaccard
+                cypher_jaccard = 'MATCH (p1 {title: "' \
+                                 + str(i[0]) + '"})-[]-(cuisine1) ' \
+                                               'WITH p1, collect(id(cuisine1)) AS p1Cuisine ' \
+                                               'MATCH (p2 {title: "' \
+                                 + str(i[1]) + '"})-[]-(cuisine2) ' \
+                                               'WITH p1, p1Cuisine, p2, collect(id(cuisine2)) AS p2Cuisine ' \
+                                               'RETURN p1.title AS from, p2.title AS to, ' \
+                                               'gds.alpha.similarity.jaccard(p1Cuisine, p2Cuisine) AS similarity'
+                se = session.run(cypher_jaccard)
+                for d in se:
+                    similarity_value.append("Jaccard " + str(d[2]))
+                    # Euclidean
+                cypher_euclidean = 'MATCH (p1:product {title: "' \
+                                   + str(i[0]) + '"})-[]-() ' \
+                                                 'MATCH (p2:product {title: "' \
+                                   + str(i[1]) + '"})-[]-() ' \
+                                                 'RETURN p1.title AS from, p2.title AS to, ' \
+                                                 'gds.alpha.similarity.euclideanDistance(collect(toFloat(p1.price)), ' \
+                                                 'collect(toFloat(p2.price))) AS similarity '
+                se = session.run(cypher_euclidean)
+                for d in se:
+                    similarity_value.append("Euclidean " + str(d[2]))
+                # AdamicAdar
+                cypher_adamicadar = 'MATCH (p1 {title: "' \
+                                    + str(i[0]) + '"})-[]-() ' \
+                                                  'MATCH (p2 {title: "' \
+                                    + str(i[1]) + '"})-[]-() ' \
+                                                  'RETURN gds.alpha.linkprediction.adamicAdar(p1, p2) LIMIT 1'
+                se = session.run(cypher_adamicadar)
+                for d in se:
+                    link_prediction_value.append("AdamicAdar " + str(d[0]))
+                # CommonNeighbors
+                cypher_commonneighbors = 'MATCH (p1 {title: "' \
+                                         + str(i[0]) + '"})-[]-() ' \
+                                                       'MATCH (p2 {title: "' \
+                                         + str(i[1]) + '"})-[]-() ' \
+                                                       'RETURN gds.alpha.linkprediction.commonNeighbors(p1, p2) LIMIT 1'
+                se = session.run(cypher_commonneighbors)
+                for d in se:
+                    link_prediction_value.append("CommonNeighbors " + str(d[0]))
+            end = time.perf_counter()
+            total_time = end - start
+            print(total_time)
 
         except BaseException as e:
             print('error: ' + str(e))

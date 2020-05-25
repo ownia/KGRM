@@ -214,7 +214,9 @@ html {
     margin-bottom: 2%;
 }
 
+/*
 a {
+    text-decoration: blink;
 }
 
 .active {
@@ -232,3 +234,4 @@ a {
     cursor: pointer;
     text-decoration: none;
 }
+*/
