@@ -6,11 +6,13 @@ import json
 import hanlp
 import re
 import numpy as np
-from neo4j import GraphDatabase, basic_auth, kerberos_auth, custom_auth, TRUST_ALL_CERTIFICATES
+from neo4j import GraphDatabase, Transaction, basic_auth, kerberos_auth, custom_auth, TRUST_ALL_CERTIFICATES
 import synonyms
 import heapq
 from typing import List
 import time
+
+# import jieba
 
 # import warnings
 # warnings.filterwarnings("ignore")
@@ -316,7 +318,8 @@ def sim_coe():
                   format(float(ochiai_std), '.8f')]
 
     return render_template('similarity_coefficient.html', data=data_count,
-                           html_text=df.to_html(classes='sim-coe-list'), sim_list=df2.to_html(classes='sim-coe-list'))
+                           html_text=df.to_html(classes='sim-coe-list') + "<br>",
+                           sim_list=df2.to_html(classes='sim-coe-list') + "<br>")
 
 
 def combination(node: List[str]):
@@ -333,10 +336,16 @@ def combination(node: List[str]):
 @app.route('/evaluation_index', methods=("GET", "POST"))
 def eva_index():
     data = count()
-    e_index = []
+    text = ""
     max_n_total = []  # synonyms值集合
     similarity_value = []
     link_prediction_value = []
+
+    entity_list_text = ""
+    node_list_text = ""
+    similarity_value_text = ""
+    link_prediction_value_text = ""
+
     if request.method == "POST":
         try:
             """
@@ -347,6 +356,7 @@ def eva_index():
                 将m个实体存储在eva_list2列表中
             """
             eva_text = request.form['eva_post']
+            text = eva_text
             start = time.perf_counter()
             # print(eva_text)
             eva_recognizer = hanlp.load(hanlp.pretrained.ner.MSRA_NER_BERT_BASE_ZH)
@@ -393,25 +403,34 @@ def eva_index():
             with open("node.txt", "r", encoding="utf-8") as f:
                 for line in f:
                     data_list.append(line.strip("\n"))
+            # ieba.load_userdict("node.txt")
             for sen1 in entity_list:
                 # print(sen1)
                 data_dict = {}
                 for sen2 in data_list:
                     r = synonyms.compare(sen1, sen2, seg=True)
                     data_dict[str(sen2)] = r
-                max_n = heapq.nlargest(5, data_dict.items(), key=lambda x: x[1])
-                max_n_total.append(max_n)
-                for i in range(len(max_n)):
-                    eva_input.append(max_n[i][0])
+                if len(entity_list) <= 1:
+                    max_n = heapq.nlargest(5, data_dict.items(), key=lambda x: x[1])
+                    max_n_total.append(max_n)
+                    for i in range(len(max_n)):
+                        eva_input.append(max_n[i][0])
+                else:
+                    max_n = heapq.nlargest(2, data_dict.items(), key=lambda x: x[1])
+                    max_n_total.append(max_n)
+                    for i in range(len(max_n)):
+                        eva_input.append(max_n[i][0])
             del data_list[:]
+            print(time.perf_counter() - start)
             """
             step3:
                 对5n+k个匹配数据构建combination关系
                 执行相似度算法和链接预测算法
                     相似度算法
-                        Jaccard, Dice, Ochiai, Edit Distance, Pearson, Euclidean
+                        Jaccard, Euclidean, Cosine, Overlap
                     链接预测算法
-                        AdamicAdar
+                        Adamic Adar, Common Neighbors, Preferential Attachment,
+                        Resource Allocation, Total Neighbors
                 将算法结果经过模型进行权重和偏置处理
                 将evaluation_index执行归一化处理
             """
@@ -462,18 +481,48 @@ def eva_index():
                 se = session.run(cypher_jaccard)
                 for d in se:
                     similarity_value.append("Jaccard " + str(d[2]))
-                    # Euclidean
+                # Euclidean
                 cypher_euclidean = 'MATCH (p1:product {title: "' \
                                    + str(i[0]) + '"})-[]-() ' \
                                                  'MATCH (p2:product {title: "' \
                                    + str(i[1]) + '"})-[]-() ' \
                                                  'RETURN p1.title AS from, p2.title AS to, ' \
-                                                 'gds.alpha.similarity.euclideanDistance(collect(toFloat(p1.price)), ' \
-                                                 'collect(toFloat(p2.price))) AS similarity '
+                                                 'gds.alpha.similarity.euclideanDistance(collect(coalesce(toFloat(' \
+                                                 'p1.price), gds.util.NaN())), collect(coalesce(toFloat(p2.price), ' \
+                                                 'gds.util.NaN()))) AS similarity '
                 se = session.run(cypher_euclidean)
+                if Transaction.success:
+                    for d in se:
+                        similarity_value.append("Euclidean " + str(d[2]))
+                else:
+                    similarity_value.append("Euclidean 0.0")
+                # Cosine
+                cypher_cosine = 'MATCH (p1:product {title: "' \
+                                + str(i[0]) + '"})-[]-() ' \
+                                              'MATCH (p2:product {title: "' \
+                                + str(i[1]) + '"})-[]-() ' \
+                                              'RETURN p1.title AS from, p2.title AS to, ' \
+                                              'gds.alpha.similarity.cosine(collect(toFloat(p1.price)), ' \
+                                              'collect(toFloat(p2.price))) AS similarity '
+                se = session.run(cypher_cosine)
+                if Transaction.success:
+                    for d in se:
+                        similarity_value.append("Cosine " + str(d[2]))
+                else:
+                    similarity_value.append("Cosine 0.0")
+                # Overlap
+                cypher_overlap = 'MATCH (p1 {title: "' \
+                                 + str(i[0]) + '"})-[]-(cuisine1) ' \
+                                               'WITH p1, collect(id(cuisine1)) AS p1Cuisine ' \
+                                               'MATCH (p2 {title: "' \
+                                 + str(i[1]) + '"})-[]-(cuisine2) ' \
+                                               'WITH p1, p1Cuisine, p2, collect(id(cuisine2)) AS p2Cuisine ' \
+                                               'RETURN p1.title AS from, p2.title AS to, ' \
+                                               'gds.alpha.similarity.overlap(p1Cuisine, p2Cuisine) AS similarity'
+                se = session.run(cypher_overlap)
                 for d in se:
-                    similarity_value.append("Euclidean " + str(d[2]))
-                # AdamicAdar
+                    similarity_value.append("Overlap " + str(d[2]))
+                # Adamic Adar
                 cypher_adamicadar = 'MATCH (p1 {title: "' \
                                     + str(i[0]) + '"})-[]-() ' \
                                                   'MATCH (p2 {title: "' \
@@ -481,8 +530,8 @@ def eva_index():
                                                   'RETURN gds.alpha.linkprediction.adamicAdar(p1, p2) LIMIT 1'
                 se = session.run(cypher_adamicadar)
                 for d in se:
-                    link_prediction_value.append("AdamicAdar " + str(d[0]))
-                # CommonNeighbors
+                    link_prediction_value.append("Adamic Adar " + str(d[0]))
+                # Common Neighbors
                 cypher_commonneighbors = 'MATCH (p1 {title: "' \
                                          + str(i[0]) + '"})-[]-() ' \
                                                        'MATCH (p2 {title: "' \
@@ -490,16 +539,61 @@ def eva_index():
                                                        'RETURN gds.alpha.linkprediction.commonNeighbors(p1, p2) LIMIT 1'
                 se = session.run(cypher_commonneighbors)
                 for d in se:
-                    link_prediction_value.append("CommonNeighbors " + str(d[0]))
+                    link_prediction_value.append("Common Neighbors " + str(d[0]))
+                # Preferential Attachment
+                cypher_preferentialattachment = 'MATCH (p1 {title: "' \
+                                                + str(i[0]) + '"})-[]-() ' \
+                                                              'MATCH (p2 {title: "' \
+                                                + str(i[1]) + '"})-[]-() ' \
+                                                              'RETURN gds.alpha.linkprediction' \
+                                                              '.preferentialAttachment(p1, p2) LIMIT 1'
+                se = session.run(cypher_preferentialattachment)
+                for d in se:
+                    link_prediction_value.append("Preferential Attachment " + str(d[0]))
+                # Resource Allocation
+                cypher_resourceallocation = 'MATCH (p1 {title: "' \
+                                            + str(i[0]) + '"})-[]-() ' \
+                                                          'MATCH (p2 {title: "' \
+                                            + str(i[1]) + '"})-[]-() ' \
+                                                          'RETURN gds.alpha.linkprediction.resourceAllocation(p1, ' \
+                                                          'p2) LIMIT 1'
+                se = session.run(cypher_resourceallocation)
+                for d in se:
+                    link_prediction_value.append("Resource Allocation " + str(d[0]))
+                # Total Neighbors
+                cypher_totalneighbors = 'MATCH (p1 {title: "' \
+                                        + str(i[0]) + '"})-[]-() ' \
+                                                      'MATCH (p2 {title: "' \
+                                        + str(i[1]) + '"})-[]-() ' \
+                                                      'RETURN gds.alpha.linkprediction.totalNeighbors(p1, p2) LIMIT 1'
+                se = session.run(cypher_totalneighbors)
+                for d in se:
+                    link_prediction_value.append("Total Neighbors " + str(d[0]))
             end = time.perf_counter()
             total_time = end - start
             print(total_time)
+            """
+            step4:
+                输出数据
+            """
+            for i in eva_list2:
+                entity_list_text += i + "<br>"
+            for i in entity_list:
+                entity_list_text += i + "<br>"
+            for i in eva_input:
+                node_list_text += i + "<br>"
+            for i in similarity_value:
+                similarity_value_text += i + "<br>"
+            for i in link_prediction_value:
+                link_prediction_value_text += i + "<br>"
 
         except BaseException as e:
-            print('error: ' + str(e))
+            print('Error: ' + str(e))
+            text = 'Error: ' + str(e)
 
-    return render_template('evaluation_index.html', data=data, index=e_index, max_n_total=max_n_total,
-                           similarity_value=similarity_value, link_prediction_value=link_prediction_value)
+    return render_template('evaluation_index.html', data=data, text=text, entity_list_text=entity_list_text,
+                           node_list_text=node_list_text, similarity_value_text=similarity_value_text,
+                           link_prediction_value_text=link_prediction_value_text)
 
 
 @app.errorhandler(404)

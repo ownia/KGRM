@@ -41,13 +41,13 @@
 <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
     <h5 class="my-0 mr-md-auto font-weight-normal">家电制造服务资源管理系统</h5>
     <nav class="my-2 my-md-0 mr-md-3">
-        <a class="p-2 text-dark" href="/">Home</a>
-        <a class="p-2 text-dark" href="/cypher">Cypher</a>
-        <a class="p-2 text-dark" href="/graph_visualization">Graph</a>
-        <a class="p-2 text-dark" href="/ner">DNER</a>
-        <a class="p-2 text-dark" href="/similarity_coefficient">Sim-Coe</a>
-        <a class="p-2 text-dark" href="/evaluation_index">Eva-Index</a>
-        <a class="p-2 text-dark" href="/about">About</a>
+        <a class="p-2 text-dark inactive" href="/">Home</a>
+        <a class="p-2 text-dark inactive" href="/cypher">Cypher</a>
+        <a class="p-2 text-dark inactive" href="/graph_visualization">Graph</a>
+        <a class="p-2 text-dark inactive" href="/ner">DNER</a>
+        <a class="p-2 text-dark inactive" href="/similarity_coefficient">Sim-Coe</a>
+        <a class="p-2 text-dark active" href="/evaluation_index">Eva-Index</a>
+        <a class="p-2 text-dark inactive" href="/about">About</a>
     </nav>
     <a class="btn btn-outline-primary" href="#" data-toggle="modal" data-target="#myModal">What's new?</a>
     <!-- 模态框 -->
@@ -94,7 +94,63 @@
 </div>
 
 <div class="container">
+    <hr class="half-rule">
+    <div>
+        {{text}}
+    </div>
+    <hr class="half-rule">
+</div>
 
+<div style="margin-left: 20%;margin-right: 20%">
+    <button type="button" class="btn btn-lg btn-block btn-primary">家电资源相关文本价值评价指标</button>
+    <br>
+    <div class="card-deck text-center row-cols-sm-3">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">实体列表(entity_list)</h4>
+            </div>
+            <div class="card-body" style="height: 400px; overflow: auto">
+                <ul class="list-unstyled mt-3 mb-4">
+                    {{entity_list_text|safe}}
+                </ul>
+            </div>
+        </div>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">节点列表(node_list)</h4>
+            </div>
+            <div class="card-body" style="height: 400px; overflow: auto">
+                <ul class="list-unstyled mt-3 mb-4">
+                    {{node_list_text|safe}}
+                </ul>
+            </div>
+        </div>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">similarity_value</h4>
+            </div>
+            <div class="card-body" style="height: 400px; overflow: auto">
+                <ul class="list-unstyled mt-3 mb-4">
+                    {{similarity_value_text|safe}}
+                </ul>
+            </div>
+        </div>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">link_prediction_value</h4>
+            </div>
+            <div class="card-body" style="height: 400px; overflow: auto">
+                <ul class="list-unstyled mt-3 mb-4">
+                    {{link_prediction_value_text|safe}}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <!--
     <div class="container text-center">
         <h4>节点匹配combination</h4>
         {{index}}
@@ -114,6 +170,7 @@
         <h4>link_prediction</h4>
         {{link_prediction_value}}
     </div>
+    -->
 
     <footer class="pt-4 my-md-5 pt-md-5 border-top">
         <div class="row">

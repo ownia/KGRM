@@ -1,4 +1,4 @@
-from neo4j import GraphDatabase
+from neo4j import GraphDatabase, Transaction
 from py2neo import Graph
 import pandas as pd
 import json
@@ -57,7 +57,7 @@ def gds_test():
              + '海尔BCD-458WDVMU1' + '"})-[]-() ' \
                                    'MATCH (p2 {title: "' \
              + "格力(GREE)" + '"})-[]-() ' \
-                                 'RETURN gds.alpha.linkprediction.commonNeighbors(p1, p2) LIMIT 1'
+                            'RETURN gds.alpha.linkprediction.commonNeighbors(p1, p2) LIMIT 1'
     se = session.run(cypher)
     for i in se:
         print(i[0])
@@ -69,14 +69,36 @@ def gds_test_2():
              + '海尔BCD-458WDVMU1' + '"})-[]-() ' \
                                    'MATCH (p2 {title: "' \
              + "格力(GREE)" + '"})-[]-() ' \
-                                 'RETURN gds.alpha.linkprediction.commonNeighbors(p1, p2) LIMIT 1'
+                            'RETURN gds.alpha.linkprediction.commonNeighbors(p1, p2) LIMIT 1'
     se = graph.run(cypher).data()
     print(se)
+
+
+def gds_test_3():
+    uri = "bolt://localhost:7687"
+    driver = GraphDatabase.driver(uri, auth=("neo4j", "password"), encrypted=False)
+    session = driver.session()
+    similarity_value = []
+    cypher_euclidean = 'MATCH (p1:product {title: "' \
+                       + '海尔BCD-458WDVMU1' + '"})-[]-() ' \
+                                             'MATCH (p2:product {title: "' \
+                       + "格力(GREE)" + '"})-[]-() ' \
+                                      'RETURN p1.title AS from, p2.title AS to, ' \
+                                      'gds.alpha.similarity.euclideanDistance(collect(coalesce(toFloat(' \
+                                      'p1.price), gds.util.NaN())), collect(coalesce(toFloat(p2.price), ' \
+                                      'gds.util.NaN()))) AS similarity '
+    se = session.run(cypher_euclidean)
+    if Transaction.success:
+        print("1")
+    else:
+        print("2")
 
 
 if __name__ == '__main__':
     # eva_index_cypher_test()
     # new_test()
+
+    """
     start = time.perf_counter()
     gds_test()
     end = time.perf_counter()
@@ -85,3 +107,6 @@ if __name__ == '__main__':
     gds_test_2()
     end = time.perf_counter()
     print(end - start)
+    """
+
+    gds_test_3()
