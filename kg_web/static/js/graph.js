@@ -37,11 +37,11 @@ $(function () {
             },
             {
                 selector: 'node[label = "newNode"]',
-                css: {'background-color': '#007bff', 'content': 'data(id)'}
+                css: {'background-color': '#007bff', 'content': 'data(title)'}
             },
             {
                 selector: 'node[label = "class"]',
-                css: {'background-color': '#ffcb32', 'content': 'data(id)'}
+                css: {'background-color': '#ffcb32', 'content': 'data(title)'}
             },
             {
                 selector: 'edge',

@@ -74,6 +74,8 @@ html {
 #key mark {
     background-color: #007bff;
     color: #ffffff;
+    width: 90%;
+    height: 90%;
 }
 
 #banner {

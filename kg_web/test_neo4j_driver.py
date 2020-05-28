@@ -82,16 +82,28 @@ def gds_test_3():
     cypher_euclidean = 'MATCH (p1:product {title: "' \
                        + '海尔BCD-458WDVMU1' + '"})-[]-() ' \
                                              'MATCH (p2:product {title: "' \
-                       + "格力(GREE)" + '"})-[]-() ' \
-                                      'RETURN p1.title AS from, p2.title AS to, ' \
-                                      'gds.alpha.similarity.euclideanDistance(collect(coalesce(toFloat(' \
-                                      'p1.price), gds.util.NaN())), collect(coalesce(toFloat(p2.price), ' \
-                                      'gds.util.NaN()))) AS similarity '
+                       + "海尔BCD-458WDVMU1" + '"})-[]-() ' \
+                                             'RETURN p1.title AS from, p2.title AS to, ' \
+                                             'gds.alpha.similarity.euclideanDistance(collect(coalesce(toFloat(' \
+                                             'p1.price), gds.util.NaN())), collect(coalesce(toFloat(p2.price), ' \
+                                             'gds.util.NaN()))) AS similarity '
     se = session.run(cypher_euclidean)
-    if Transaction.success:
-        print("1")
-    else:
-        print("2")
+    # for d in se:
+    #     print(str(d[2]))
+    print(se.single().value('similarity'))
+
+
+def gds_test_4():
+    uri = "bolt://localhost:7687"
+    driver = GraphDatabase.driver(uri, auth=("neo4j", "password"), encrypted=False)
+    session = driver.session()
+    cypher = 'MATCH (p1 {title: "' \
+             + '海尔BCD-458WDVMU1' + '"})-[]-() ' \
+                                   'MATCH (p2 {title: "' \
+             + "格力(GREE)" + '"})-[]-() ' \
+                            'RETURN gds.alpha.linkprediction.commonNeighbors(p1, p2) LIMIT 1'
+    se = session.run(cypher)
+    print(se.single().value())
 
 
 if __name__ == '__main__':
@@ -108,5 +120,7 @@ if __name__ == '__main__':
     end = time.perf_counter()
     print(end - start)
     """
-
-    gds_test_3()
+    start = time.perf_counter()
+    gds_test_4()
+    end = time.perf_counter()
+    print(end - start)

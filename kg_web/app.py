@@ -20,7 +20,9 @@ import time
 app = Flask(__name__)
 graph = Graph()
 ctx = app.app_context()
-ctx.text = 'match (n:newNode)-[r]-(k:newNode) return n,r,k'
+
+
+# ctx.text = 'match (n:newNode)-[r]-(k:newNode) return n,r,k'
 
 
 def build_nodes(node_record):
@@ -333,6 +335,13 @@ def combination(node: List[str]):
     return result
 
 
+def model(j, e, c, o, aa, cn, pa, ra, tn, total):
+    result = 0
+    # print(total)
+
+    return result
+
+
 @app.route('/evaluation_index', methods=("GET", "POST"))
 def eva_index():
     data = count()
@@ -345,6 +354,8 @@ def eva_index():
     node_list_text = ""
     similarity_value_text = ""
     link_prediction_value_text = ""
+    timeline = ""
+    result = ""
 
     if request.method == "POST":
         try:
@@ -371,6 +382,8 @@ def eva_index():
                     if len(i[0]) > 1:
                         eva_list2.append(i[0])
             # print(eva_list2)
+            step1_time = time.perf_counter()
+
             """
             step2:
                 针对可能存在的节点label类型为product的实体进行正则表达式匹配
@@ -400,7 +413,7 @@ def eva_index():
                     eva_input.append(str(d[0]))
             # print(entity_list)
             data_list = []
-            with open("node.txt", "r", encoding="utf-8") as f:
+            with open("node_min.txt", "r", encoding="utf-8") as f:
                 for line in f:
                     data_list.append(line.strip("\n"))
             # ieba.load_userdict("node.txt")
@@ -421,7 +434,8 @@ def eva_index():
                     for i in range(len(max_n)):
                         eva_input.append(max_n[i][0])
             del data_list[:]
-            print(time.perf_counter() - start)
+            step2_time = time.perf_counter()
+
             """
             step3:
                 对5n+k个匹配数据构建combination关系
@@ -431,11 +445,19 @@ def eva_index():
                     链接预测算法
                         Adamic Adar, Common Neighbors, Preferential Attachment,
                         Resource Allocation, Total Neighbors
-                将算法结果经过模型进行权重和偏置处理
-                将evaluation_index执行归一化处理
             """
             # print(eva_input)
             e_index = combination(eva_input)
+            jaccard_value = 0
+            euclidean_value = 0
+            cosine_value = 0
+            overlap_value = 0
+            adamicadar_value = 0
+            commonneighbors_value = 0
+            preferentialattachment_value = 0
+            resourceallocation_value = 0
+            totalneighbors_value = 0
+
             # Jaccard
             """
             for i in e_index:
@@ -479,8 +501,10 @@ def eva_index():
                                                'RETURN p1.title AS from, p2.title AS to, ' \
                                                'gds.alpha.similarity.jaccard(p1Cuisine, p2Cuisine) AS similarity'
                 se = session.run(cypher_jaccard)
-                for d in se:
-                    similarity_value.append("Jaccard " + str(d[2]))
+                value = se.single().value('similarity')
+                jaccard_value += value
+                similarity_value.append("Jaccard " + str(value))
+
                 # Euclidean
                 cypher_euclidean = 'MATCH (p1:product {title: "' \
                                    + str(i[0]) + '"})-[]-() ' \
@@ -491,25 +515,40 @@ def eva_index():
                                                  'p1.price), gds.util.NaN())), collect(coalesce(toFloat(p2.price), ' \
                                                  'gds.util.NaN()))) AS similarity '
                 se = session.run(cypher_euclidean)
+                """
                 if Transaction.success:
                     for d in se:
                         similarity_value.append("Euclidean " + str(d[2]))
                 else:
                     similarity_value.append("Euclidean 0.0")
+                """
+                for d in se:
+                    euclidean_value += d[2]
+                    similarity_value.append("Euclidean " + str(d[2]))
+                # similarity_value.append("Euclidean " + str(se.single().value('similarity')))
+
                 # Cosine
                 cypher_cosine = 'MATCH (p1:product {title: "' \
                                 + str(i[0]) + '"})-[]-() ' \
                                               'MATCH (p2:product {title: "' \
                                 + str(i[1]) + '"})-[]-() ' \
                                               'RETURN p1.title AS from, p2.title AS to, ' \
-                                              'gds.alpha.similarity.cosine(collect(toFloat(p1.price)), ' \
-                                              'collect(toFloat(p2.price))) AS similarity '
+                                              'gds.alpha.similarity.cosine(collect(coalesce(toFloat(p1.price), ' \
+                                              'gds.util.NaN())), collect(coalesce(toFloat(p2.price), gds.util.NaN(' \
+                                              ')))) AS similarity '
                 se = session.run(cypher_cosine)
+                """
                 if Transaction.success:
                     for d in se:
                         similarity_value.append("Cosine " + str(d[2]))
                 else:
-                    similarity_value.append("Cosine 0.0")
+                    similarity_value.append("Cosine 0.0")                
+                """
+                for d in se:
+                    cosine_value += d[2]
+                    similarity_value.append("Cosine " + str(d[2]))
+                # similarity_value.append("Cosine " + str(se.single().value('similarity')))
+
                 # Overlap
                 cypher_overlap = 'MATCH (p1 {title: "' \
                                  + str(i[0]) + '"})-[]-(cuisine1) ' \
@@ -520,8 +559,10 @@ def eva_index():
                                                'RETURN p1.title AS from, p2.title AS to, ' \
                                                'gds.alpha.similarity.overlap(p1Cuisine, p2Cuisine) AS similarity'
                 se = session.run(cypher_overlap)
-                for d in se:
-                    similarity_value.append("Overlap " + str(d[2]))
+                value = se.single().value('similarity')
+                overlap_value += value
+                similarity_value.append("Overlap " + str(value))
+
                 # Adamic Adar
                 cypher_adamicadar = 'MATCH (p1 {title: "' \
                                     + str(i[0]) + '"})-[]-() ' \
@@ -529,8 +570,10 @@ def eva_index():
                                     + str(i[1]) + '"})-[]-() ' \
                                                   'RETURN gds.alpha.linkprediction.adamicAdar(p1, p2) LIMIT 1'
                 se = session.run(cypher_adamicadar)
-                for d in se:
-                    link_prediction_value.append("Adamic Adar " + str(d[0]))
+                value = se.single().value()
+                adamicadar_value += value
+                link_prediction_value.append("Adamic Adar " + str(value))
+
                 # Common Neighbors
                 cypher_commonneighbors = 'MATCH (p1 {title: "' \
                                          + str(i[0]) + '"})-[]-() ' \
@@ -538,8 +581,10 @@ def eva_index():
                                          + str(i[1]) + '"})-[]-() ' \
                                                        'RETURN gds.alpha.linkprediction.commonNeighbors(p1, p2) LIMIT 1'
                 se = session.run(cypher_commonneighbors)
-                for d in se:
-                    link_prediction_value.append("Common Neighbors " + str(d[0]))
+                value = se.single().value()
+                commonneighbors_value += value
+                link_prediction_value.append("Common Neighbors " + str(value))
+
                 # Preferential Attachment
                 cypher_preferentialattachment = 'MATCH (p1 {title: "' \
                                                 + str(i[0]) + '"})-[]-() ' \
@@ -548,8 +593,10 @@ def eva_index():
                                                               'RETURN gds.alpha.linkprediction' \
                                                               '.preferentialAttachment(p1, p2) LIMIT 1'
                 se = session.run(cypher_preferentialattachment)
-                for d in se:
-                    link_prediction_value.append("Preferential Attachment " + str(d[0]))
+                value = se.single().value()
+                preferentialattachment_value += value
+                link_prediction_value.append("Preferential Attachment " + str(value))
+
                 # Resource Allocation
                 cypher_resourceallocation = 'MATCH (p1 {title: "' \
                                             + str(i[0]) + '"})-[]-() ' \
@@ -558,8 +605,10 @@ def eva_index():
                                                           'RETURN gds.alpha.linkprediction.resourceAllocation(p1, ' \
                                                           'p2) LIMIT 1'
                 se = session.run(cypher_resourceallocation)
-                for d in se:
-                    link_prediction_value.append("Resource Allocation " + str(d[0]))
+                value = se.single().value()
+                resourceallocation_value += value
+                link_prediction_value.append("Resource Allocation " + str(value))
+
                 # Total Neighbors
                 cypher_totalneighbors = 'MATCH (p1 {title: "' \
                                         + str(i[0]) + '"})-[]-() ' \
@@ -567,25 +616,58 @@ def eva_index():
                                         + str(i[1]) + '"})-[]-() ' \
                                                       'RETURN gds.alpha.linkprediction.totalNeighbors(p1, p2) LIMIT 1'
                 se = session.run(cypher_totalneighbors)
-                for d in se:
-                    link_prediction_value.append("Total Neighbors " + str(d[0]))
-            end = time.perf_counter()
-            total_time = end - start
-            print(total_time)
+                value = se.single().value()
+                totalneighbors_value += value
+                link_prediction_value.append("Total Neighbors " + str(value))
+            step3_time = time.perf_counter()
+
             """
             step4:
+                将算法结果经过模型进行权重和偏置处理
+                将evaluation_index执行归一化处理
                 输出数据
             """
-            for i in eva_list2:
-                entity_list_text += i + "<br>"
+            # print(entity_list)
+            # print(eva_list2)
             for i in entity_list:
                 entity_list_text += i + "<br>"
-            for i in eva_input:
+                temp = text.replace(str(i), str("<mark>" + i + "</mark> "))
+                text = temp
+            for i in eva_list2:
+                entity_list_text += i + "<br>"
+                temp = text.replace(str(i), str("<mark>" + i + "</mark> "))
+                text = temp
+
+            node_list = set(eva_input)
+            for i in node_list:
                 node_list_text += i + "<br>"
             for i in similarity_value:
                 similarity_value_text += i + "<br>"
             for i in link_prediction_value:
                 link_prediction_value_text += i + "<br>"
+
+            total = len(e_index)
+            result = "<strong>Jaccard_mean:</strong> " + str(float(jaccard_value / total)) + "<br>"
+            result += "<strong>Euclidean_mean:</strong> " + str(float(euclidean_value / total)) + "<br>"
+            result += "<strong>Cosine_mean:</strong> " + str(float(cosine_value / total)) + "<br>"
+            result += "<strong>Overlap_mean:</strong> " + str(float(overlap_value / total)) + "<br>"
+            result += "<strong>Adamic_Adar_mean:</strong> " + str(float(adamicadar_value / total)) + "<br>"
+            result += "<strong>Common_Neighbors_mean:</strong> " + str(float(commonneighbors_value / total)) + "<br>"
+            result += "<strong>Preferential_Attachment_mean:</strong> " + str(
+                float(preferentialattachment_value / total)) + "<br>"
+            result += "<strong>Resource_Allocation_mean:</strong> " + str(
+                float(resourceallocation_value / total)) + "<br>"
+            result += "<strong>Total_Neighbors_mean:</strong> " + str(float(totalneighbors_value / total)) + "<br>"
+            eva_index_result = model(jaccard_value, euclidean_value, cosine_value, overlap_value, adamicadar_value,
+                                     commonneighbors_value, preferentialattachment_value, resourceallocation_value,
+                                     totalneighbors_value, total)
+
+            step4_time = time.perf_counter()
+            timeline = "<strong>Step1:</strong>  " + str(step1_time - start) + "s<br>"
+            timeline += "<strong>Step2:</strong>  " + str(step2_time - step1_time) + "s<br>"
+            timeline += "<strong>Step3:</strong>  " + str(step3_time - step2_time) + "s<br>"
+            timeline += "<strong>Step4:</strong>  " + str(step4_time - step3_time) + "s<br>"
+            timeline += "<strong>Total time:</strong>  " + str(step4_time - start) + "s<br>"
 
         except BaseException as e:
             print('Error: ' + str(e))
@@ -593,7 +675,7 @@ def eva_index():
 
     return render_template('evaluation_index.html', data=data, text=text, entity_list_text=entity_list_text,
                            node_list_text=node_list_text, similarity_value_text=similarity_value_text,
-                           link_prediction_value_text=link_prediction_value_text)
+                           link_prediction_value_text=link_prediction_value_text, timeline=timeline, result=result)
 
 
 @app.errorhandler(404)
