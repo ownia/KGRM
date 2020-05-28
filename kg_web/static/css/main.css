@@ -8,6 +8,11 @@ html {
     }
 }
 
+@font-face {
+    font-family: Bustracks;
+    src: url("/static/fonts/Bustracks-FREE-3.ttf");
+}
+
 .container {
     max-width: 960px;
 }
@@ -197,9 +202,10 @@ html {
 }
 
 .illustration span {
+    font-family: "Bustracks";
     width: 45%;
     height: 42vw;
-    font-size: 4em;
+    font-size: 5em;
     font-weight: bold;
     float: left;
     margin-left: 5%;

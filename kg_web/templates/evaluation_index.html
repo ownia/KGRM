@@ -18,7 +18,6 @@
     <script type="text/javascript" id="MathJax-script" async
             src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
     </script>
-    <script src="{{ url_for('static', filename='js/math.js') }}"></script>
     <!-- Favicons -->
     <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <meta name="theme-color" content="#563d7c">
@@ -43,7 +42,7 @@
 </head>
 <body>
 <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
-    <h5 class="my-0 mr-md-auto font-weight-normal">家电制造服务资源管理系统</h5>
+    <h5 class="my-0 mr-md-auto font-weight-bold">家电制造服务资源管理系统</h5>
     <nav class="my-2 my-md-0 mr-md-3">
         <a class="p-2 text-dark inactive" href="/">Home</a>
         <a class="p-2 text-dark inactive" href="/cypher">Cypher</a>
@@ -167,12 +166,29 @@
                 文本评价结果
             </h3>
             <div>
+                <p class="mb-0">
+                    {{output_1|safe}}
+                </p>
                 <span>
-                    {{formula}}}
+                    {{formula_combination}}
                 </span>
                 <p class="mb-0">
                     {{result|safe}}
                 </p>
+                <p class="mb-0">
+                    {{output_2|safe}}
+                </p>
+                <span>
+                    {{formula_function}}
+                </span>
+                <p class="mb-0">
+                    {{output_3|safe}}
+                </p>
+                <div class="alert alert-info">
+                    <p class="mb-0">
+                        {{output_4|safe}}
+                    </p>
+                </div>
             </div>
         </div>
     </div>

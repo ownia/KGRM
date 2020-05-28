@@ -335,10 +335,27 @@ def combination(node: List[str]):
     return result
 
 
-def model(j, e, c, o, aa, cn, pa, ra, tn, total):
-    result = 0
+def model(j, e, c, o, aa, cn, pa, ra, tn, total, weight1, weight2):
     # print(total)
+    edge = len(graph)
+    c_new = abs(c)
+    zo_value = (float(j / total) + float(c_new / total) + float(o / total) + float(cn / total)) / 4
+    e_new = float((e / total) / edge)
+    if e_new >= 1.0:
+        e_new = 1.0
+    pa_mean = float(pa / total)
+    pa_new = float(pa_mean / edge)
+    if pa_mean >= 2 * edge:
+        pa_new = 1.0
+    else:
+        if pa_new >= 1.0:
+            pa_new = 1.0
+    tn_new = float((tn / total) / edge)
+    if tn_new >= 1.0:
+        tn_new = 1.0
+    lp_value = (float(aa / total) + float(ra / total)) / 2
 
+    result = weight1 * zo_value + (1 - weight1) * (weight2 * lp_value + (1 - weight2) * (e_new + pa_new + tn_new) / 3)
     return result
 
 
@@ -356,6 +373,12 @@ def eva_index():
     link_prediction_value_text = ""
     timeline = ""
     result = ""
+    formula_combination = ""
+    formula_function = ""
+    output_1 = ""
+    output_2 = ""
+    output_3 = ""
+    output_4 = ""
 
     if request.method == "POST":
         try:
@@ -647,7 +670,8 @@ def eva_index():
                 link_prediction_value_text += i + "<br>"
 
             total = len(e_index)
-            result = "<strong>Jaccard_mean:</strong> " + str(float(jaccard_value / total)) + "<br>"
+            result = "<strong>9</strong>种算法结果均值如下:<br>"
+            result += "<strong>Jaccard_mean:</strong> " + str(float(jaccard_value / total)) + "<br>"
             result += "<strong>Euclidean_mean:</strong> " + str(float(euclidean_value / total)) + "<br>"
             result += "<strong>Cosine_mean:</strong> " + str(float(cosine_value / total)) + "<br>"
             result += "<strong>Overlap_mean:</strong> " + str(float(overlap_value / total)) + "<br>"
@@ -660,14 +684,49 @@ def eva_index():
             result += "<strong>Total_Neighbors_mean:</strong> " + str(float(totalneighbors_value / total)) + "<br>"
             eva_index_result = model(jaccard_value, euclidean_value, cosine_value, overlap_value, adamicadar_value,
                                      commonneighbors_value, preferentialattachment_value, resourceallocation_value,
-                                     totalneighbors_value, total)
+                                     totalneighbors_value, total, 0.8, 0.5)
+
+            output_1 = "共识别实体<strong>" + str(len(entity_list) + len(eva_list2)) + "</strong>个，匹配节点<strong>" + str(
+                len(node_list)) + "</strong>个，识别节点通过combination模块、<strong>9</strong>种相似度算法和链接预测算法获得<strong>" + str(
+                total * 9) + "</strong>个结果。"
+            output_2 = "<br>将<strong>" + str(total * 9) + "</strong>个结果通过上层模型函数:<br>"
+            formula_function = "$$ f(n)=(weight1\\times\\frac{j+\\lvert c\\rvert+o+cn}{4})+(1-weight1)\\times(" \
+                               "weight2\\times\\frac{aa+ra}{2}+(1-weight2)\\times\\frac{e+pa+tn}{edge\\times3}) $$ "
+            output_3 = "计算得出该文本的评价指数(evaluation_index)为<strong>" + str(eva_index_result) + "</strong>。<br><br>"
+            if eva_index_result > 0.8:
+                output_4 = "<strong>该家电文本包含资源关系优秀。</strong>"
+            elif 0.25 < eva_index_result <= 0.8:
+                output_4 = "<strong>该家电文本包含资源关系还有提升空间。</strong>"
+            else:
+                output_4 = "<strong>该家电文本包含资源关系较差。</strong>"
+
+            if len(entity_list) <= 1:
+                formula_combination = "$$C\\binom{2}{5\\times " + str(len(eva_input)) + "}\\times 9=" + str(
+                    total * 9) + "$$"
+            else:
+                formula_combination = "$$C\\binom{2}{2\\times " + str(len(eva_input)) + "}\\times 9=" + str(
+                    total * 9) + "$$"
 
             step4_time = time.perf_counter()
-            timeline = "<strong>Step1:</strong>  " + str(step1_time - start) + "s<br>"
-            timeline += "<strong>Step2:</strong>  " + str(step2_time - step1_time) + "s<br>"
-            timeline += "<strong>Step3:</strong>  " + str(step3_time - step2_time) + "s<br>"
-            timeline += "<strong>Step4:</strong>  " + str(step4_time - step3_time) + "s<br>"
-            timeline += "<strong>Total time:</strong>  " + str(step4_time - start) + "s<br>"
+            timeline = "<strong>Step1:  " + str(step1_time - start) + "s</strong><br>"
+            timeline += "获取eva_post数据<br>"
+            timeline += "使用正则表达式切割数据<br>"
+            timeline += "使用MSRA_NER_BERT_BASE_ZH模型进行命名实体识别<br>"
+            timeline += "将m个实体存储在eva_list2列表中<br><br>"
+            timeline += "<strong>Step2:  " + str(step2_time - step1_time) + "s</strong><br>"
+            timeline += "针对可能存在的节点label类型为product的实体进行正则表达式匹配<br>"
+            timeline += "读取本地node数据文件<br>"
+            timeline += "对n个节点数据进行近义词匹配获得5n个数据<br>"
+            timeline += "对m个数据进行neo4j模糊查询获得k个数据<br>"
+            timeline += "获得5n+k个匹配数据<br><br>"
+            timeline += "<strong>Step3:  " + str(step3_time - step2_time) + "s</strong><br>"
+            timeline += "对5n+k个匹配数据构建combination关系<br>"
+            timeline += "执行相似度算法和链接预测算法<br><br>"
+            timeline += "<strong>Step4:  " + str(step4_time - step3_time) + "s</strong><br>"
+            timeline += "将算法结果经过模型函数进行权重和偏置处理<br>"
+            timeline += "将evaluation_index执行归一化处理<br>"
+            timeline += "输出数据<br><br>"
+            timeline += "<strong>Total time:  " + str(step4_time - start) + "s</strong><br>"
 
         except BaseException as e:
             print('Error: ' + str(e))
@@ -675,7 +734,9 @@ def eva_index():
 
     return render_template('evaluation_index.html', data=data, text=text, entity_list_text=entity_list_text,
                            node_list_text=node_list_text, similarity_value_text=similarity_value_text,
-                           link_prediction_value_text=link_prediction_value_text, timeline=timeline, result=result)
+                           link_prediction_value_text=link_prediction_value_text, timeline=timeline, result=result,
+                           formula_combination=formula_combination, formula_function=formula_function,
+                           output_1=output_1, output_2=output_2, output_3=output_3, output_4=output_4)
 
 
 @app.errorhandler(404)
