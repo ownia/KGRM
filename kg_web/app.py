@@ -338,7 +338,8 @@ def combination(node: List[str]):
 def model(j, e, c, o, aa, cn, pa, ra, tn, total, weight1, weight2):
     # print(total)
     edge = len(graph)
-    c_new = abs(c)
+    # c_new = abs(c)
+    c_new = (c + 1) / 2
     zo_value = (float(j / total) + float(c_new / total) + float(o / total) + float(cn / total)) / 4
     e_new = float((e / total) / edge)
     if e_new >= 1.0:
@@ -684,13 +685,13 @@ def eva_index():
             result += "<strong>Total_Neighbors_mean:</strong> " + str(float(totalneighbors_value / total)) + "<br>"
             eva_index_result = model(jaccard_value, euclidean_value, cosine_value, overlap_value, adamicadar_value,
                                      commonneighbors_value, preferentialattachment_value, resourceallocation_value,
-                                     totalneighbors_value, total, 0.8, 0.5)
+                                     totalneighbors_value, total, 0.8, 0.2)
 
             output_1 = "共识别实体<strong>" + str(len(entity_list) + len(eva_list2)) + "</strong>个，匹配节点<strong>" + str(
                 len(node_list)) + "</strong>个，识别节点通过combination模块、<strong>9</strong>种相似度算法和链接预测算法获得<strong>" + str(
                 total * 9) + "</strong>个结果。"
             output_2 = "<br>将<strong>" + str(total * 9) + "</strong>个结果通过上层模型函数:<br>"
-            formula_function = "$$ f(n)=(weight1\\times\\frac{j+\\lvert c\\rvert+o+cn}{4})+(1-weight1)\\times(" \
+            formula_function = "$$ f(n)=(weight1\\times\\frac{j+\\frac{c+1}{2}+o+cn}{4})+(1-weight1)\\times(" \
                                "weight2\\times\\frac{aa+ra}{2}+(1-weight2)\\times\\frac{e+pa+tn}{edge\\times3}) $$ "
             output_3 = "计算得出该文本的评价指数(evaluation_index)为<strong>" + str(eva_index_result) + "</strong>。<br><br>"
             if eva_index_result > 0.8:

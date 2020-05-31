@@ -29,7 +29,15 @@ def combination(node: List[str]):
     return res
 
 
+def midpoint(lhn, rhn):
+    mid_1 = (lhn + rhn) / 2
+    mid_2 = (lhn + rhn) >> 1
+    print(mid_1)
+    print(mid_2)
+
+
 if __name__ == '__main__':
-    text = ["0", "1", "2", "3", "4"]
-    res = combination(text)
-    print(res)
+    # text = ["0", "1", "2", "3", "4"]
+    # res = combination(text)
+    # print(res)
+    midpoint(1, 2)
