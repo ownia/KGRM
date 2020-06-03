@@ -335,15 +335,22 @@ def combination(node: List[str]):
     return result
 
 
-def model(j, e, c, o, aa, cn, pa, ra, tn, total, weight1, weight2):
+def model(j, e, c, o, aa, cn, pa, ra, tn, total, weight1, weight2, weight3):
     # print(total)
     edge = len(graph)
+    node = len(graph.nodes)
     # c_new = abs(c)
     c_new = (c + 1) / 2
-    zo_value = (float(j / total) + float(c_new / total) + float(o / total) + float(cn / total)) / 4
-    e_new = float((e / total) / edge)
+    zo_value = (float(j / total) + float(c_new / total) + float(o / total)) / 3
+    e_new = float((e / total) / node)
     if e_new >= 1.0:
         e_new = 1.0
+    tn_new = float((tn / total) / node)
+    if tn_new >= 1.0:
+        tn_new = 1.0
+    cn_new = float((cn / total) / node)
+    if cn_new >= 1.0:
+        cn_new = 1.0
     pa_mean = float(pa / total)
     pa_new = float(pa_mean / edge)
     if pa_mean >= 2 * edge:
@@ -351,12 +358,11 @@ def model(j, e, c, o, aa, cn, pa, ra, tn, total, weight1, weight2):
     else:
         if pa_new >= 1.0:
             pa_new = 1.0
-    tn_new = float((tn / total) / edge)
-    if tn_new >= 1.0:
-        tn_new = 1.0
+
     lp_value = (float(aa / total) + float(ra / total)) / 2
 
-    result = weight1 * zo_value + (1 - weight1) * (weight2 * lp_value + (1 - weight2) * (e_new + pa_new + tn_new) / 3)
+    result = weight1 * zo_value + (1 - weight1) * (weight2 * lp_value + (1 - weight2) * (
+            (weight3 * (e_new + cn_new + tn_new) / 3) + (1 - weight3) * pa_new))
     return result
 
 
@@ -685,14 +691,15 @@ def eva_index():
             result += "<strong>Total_Neighbors_mean:</strong> " + str(float(totalneighbors_value / total)) + "<br>"
             eva_index_result = model(jaccard_value, euclidean_value, cosine_value, overlap_value, adamicadar_value,
                                      commonneighbors_value, preferentialattachment_value, resourceallocation_value,
-                                     totalneighbors_value, total, 0.8, 0.2)
+                                     totalneighbors_value, total, 0.8, 0.2, 0.5)
 
             output_1 = "共识别实体<strong>" + str(len(entity_list) + len(eva_list2)) + "</strong>个，匹配节点<strong>" + str(
                 len(node_list)) + "</strong>个，识别节点通过combination模块、<strong>9</strong>种相似度算法和链接预测算法获得<strong>" + str(
                 total * 9) + "</strong>个结果。"
             output_2 = "<br>将<strong>" + str(total * 9) + "</strong>个结果通过上层模型函数:<br>"
-            formula_function = "$$ f(n)=(weight1\\times\\frac{j+\\frac{c+1}{2}+o+cn}{4})+(1-weight1)\\times(" \
-                               "weight2\\times\\frac{aa+ra}{2}+(1-weight2)\\times\\frac{e+pa+tn}{edge\\times3}) $$ "
+            formula_function = "$$ f(n)=(weight1\\times\\frac{j+\\frac{c+1}{2}+o}{3})+(1-weight1)\\times\\{" \
+                               "weight2\\times\\frac{aa+ra}{2}+(1-weight2)\\times[weight3\\times\\frac{e+tn+cn}{" \
+                               "node\\times3}+(1-weight3)\\times\\frac{pa}{edge}])\\} $$ "
             output_3 = "计算得出该文本的评价指数(evaluation_index)为<strong>" + str(eva_index_result) + "</strong>。<br><br>"
             if eva_index_result > 0.8:
                 output_4 = "<strong>该家电文本包含资源关系优秀。</strong>"
