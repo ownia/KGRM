@@ -691,7 +691,7 @@ def eva_index():
             result += "<strong>Total_Neighbors_mean:</strong> " + str(float(totalneighbors_value / total)) + "<br>"
             eva_index_result = model(jaccard_value, euclidean_value, cosine_value, overlap_value, adamicadar_value,
                                      commonneighbors_value, preferentialattachment_value, resourceallocation_value,
-                                     totalneighbors_value, total, 0.8, 0.2, 0.5)
+                                     totalneighbors_value, total, 0.5, 0.5, 0.8)
 
             output_1 = "共识别实体<strong>" + str(len(entity_list) + len(eva_list2)) + "</strong>个，匹配节点<strong>" + str(
                 len(node_list)) + "</strong>个，识别节点通过combination模块、<strong>9</strong>种相似度算法和链接预测算法获得<strong>" + str(
