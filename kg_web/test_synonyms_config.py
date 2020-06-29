@@ -4,6 +4,7 @@ from neo4j import GraphDatabase
 import time
 from typing import List
 
+
 def comp():
     sen1 = "海尔CXW-200"
     data_list = []
