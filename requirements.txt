@@ -4,7 +4,7 @@ fake_useragent==0.1.11
 Flask==1.1.2
 hanlp==2.0.0a44
 neo4j==1.7.6
-numpy==1.18.4
+numpy==1.21.0
 pandas==1.0.4
 py2neo==4.3.0
 pyltp==0.2.1
