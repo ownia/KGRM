@@ -8,5 +8,5 @@ numpy==1.18.4
 pandas==1.0.4
 py2neo==4.3.0
 pyltp==0.2.1
-scrapy==2.1.0
+scrapy==2.6.0
 synonyms==3.10.2
