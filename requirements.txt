@@ -1,7 +1,7 @@
 chardet==3.0.4
 demjson==2.2.4
 fake_useragent==0.1.11
-Flask==1.1.2
+Flask==2.3.2
 hanlp==2.0.0a44
 neo4j==1.7.6
 numpy==1.21.0
